@@ -1,0 +1,40 @@
+<mvc:View
+    controllerName="destinationapp.controller.Master"
+    xmlns:mvc="sap.ui.core.mvc"
+    displayBlock="true"
+    xmlns="sap.m"
+>
+    <Page
+        id="Master"
+        title=""
+        backgroundDesign="Solid"
+    >
+        <SearchField
+            placeholder="Search based on Destination Name"
+            showRefreshButton="true"
+            search="onSearch"
+        />
+
+         <List
+             id ="destlist"
+            headerText="Destinations"
+            items="{/Destinations}"
+        >
+            <items>
+                <ObjectListItem
+                    intro="{ID}"
+                    title="{dest_name}"
+                    press="onListItemPress"
+                    type="Active"
+                >
+                    <firstStatus>
+                        <ObjectStatus
+                            text="{token_srv_url}"
+                        />
+                    </firstStatus>
+                </ObjectListItem>
+            </items>
+        </List>
+        <!-- <Button text="Click" press="onClick"></Button> -->
+    </Page>
+</mvc:View>

@@ -1,0 +1,355 @@
+<mvc:View controllerName="detaillogsapp.controller.detailsview"
+    xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.f"
+    xmlns:codeeditor="sap.ui.codeeditor"
+    xmlns:layout="sap.ui.layout"
+    xmlns:fb="sap.ui.comp.filterbar"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:uxap="sap.uxap"
+    xmlns="sap.m"
+    xmlns:tnt="sap.tnt"
+    xmlns:viz="sap.viz.ui5.controls"
+    xmlns:viz.data="sap.viz.ui5.data"
+    xmlns:vizFrame="sap.viz.ui5.controls"
+    xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds"
+    xmlns:suite="sap.suite.ui.commons">
+    <!-- <Page id="page" title="{i18n>title}"> -->
+    <tnt:ToolPage id="toolPage">       
+        <tnt:header> 
+            <!-- <ScrollContainer vertical="true" height="70px"> -->   
+        <tnt:ToolHeader id="shellLikeToolHeader" class="sapUiTinyMargin">  
+            <Button icon="sap-icon://menu2" type="Transparent" tooltip="Menu">    
+                <layoutData>
+                    <OverflowToolbarLayoutData priority="NeverOverflow"/> 
+                </layoutData>
+            </Button> 
+                <Image src="test-resources/sap/tnt/images/SAP_Logo.png" decorative="false" press="onLogoPressed" tooltip="SAP Logo">
+                <layoutData>
+                    <OverflowToolbarLayoutData priority="NeverOverflow"/> 
+                </layoutData> 
+            </Image>
+            <Title text="Process Logs" wrapping="false" id="productName">  
+                </Title>
+                    <ToolbarSpacer id="spacer">
+                <layoutData>
+                    <OverflowToolbarLayoutData priority="Low" group="1"/>
+                </layoutData>
+            </ToolbarSpacer>
+            <Button visible="true" icon="sap-icon://feedback" type="Transparent" id="searchButton" tooltip="Search"/>
+                <OverflowToolbarButton icon="sap-icon://download" type="Transparent" tooltip="Action 1" text="Action 1">
+                <layoutData>
+                    <OverflowToolbarLayoutData group="2"/> 
+                </layoutData>
+            </OverflowToolbarButton>
+            <OverflowToolbarButton icon="sap-icon://sys-help" type="Transparent" tooltip="Action 2" text="Action 2">
+                <layoutData>
+                    <OverflowToolbarLayoutData group="2"/>
+                </layoutData>
+                </OverflowToolbarButton>
+                <OverflowToolbarButton icon="sap-icon://menu" type="Transparent" tooltip="Action 2" text="Action 2">
+                <layoutData> 
+                    <OverflowToolbarLayoutData group="2"/>   
+                </layoutData>
+                </OverflowToolbarButton>                
+            </tnt:ToolHeader>
+            </tnt:header>
+            <tnt:mainContents>
+     <f:FlexibleColumnLayout id="flexiblecolumnlayout">  
+    <f:beginColumnPages>
+    <f:DynamicPage id="dynamicPageIds" headerExpanded="{/headerExpanded}" toggleHeaderOnTitleClick="{/titleClickable}">
+            <!-- DynamicPage Title -->
+            <f:title>
+                <f:DynamicPageTitle>
+                    <f:heading>
+                      <VBox>
+                        <Title text="Detail Logs" wrapping="true"/>   
+                        <SearchField id="headerSearch" visible="false"/>
+                      </VBox>
+                    </f:heading>
+                    <!-- <f:breadcrumbs>
+                        <Breadcrumbs>
+                            <Link text="Monitoring" press=".onMonitoringPress"  /> 
+                            <Link text="Detail Logs" subtle="true" />                         
+                        </Breadcrumbs> 
+                    </f:breadcrumbs>                 -->
+                </f:DynamicPageTitle>
+            </f:title>
+            <!-- DynamicPage Header --> 
+                <f:header> 
+                <f:DynamicPageHeader pinnable="false"> 
+                    <f:content>
+
+        <fb:FilterBar id="filterbar" persistencyKey="myPersKey" useToolbar="false" filterChange=".onFilterChange" afterVariantLoad=".onAfterVariantLoad" showGoOnFB="false"> 
+        <fb:filterGroupItems>  
+        <!-- First Line -->  
+        
+        <fb:FilterGroupItem name="search" groupName="Group0" label="" visibleInFilterBar="true">
+            <fb:control> 
+                <HBox> 
+                    <SearchField width="100%" search=".onSearch" placeholder="Search for instances" />  
+                </HBox>
+            </fb:control>   
+        </fb:FilterGroupItem> 
+        <fb:FilterGroupItem name="Status" label="Status" groupName="Group1" visibleInFilterBar="true" > 
+            <fb:control> 
+                <HBox>
+                    <MultiComboBox  placeholder="Select one or more status" width="90%" id="StatusMultiComboBox" name="Name" selectedKeys="Erroneous,Running,Suspended,Completed,Canceled" selectionChange=".onSelectionChange">
+                        <core:Item   key="Canceled" text="Canceled"/>   
+                        <core:Item   key="Completed" text="Completed"/>
+                        <core:Item   key="Erroneous" text="Erroneous"/>    
+                        <core:Item   key="Running" text="Running"/>
+                        <core:Item   key="Suspended" text="Suspended"/>    
+                    </MultiComboBox> 
+                </HBox> 
+            </fb:control>
+        </fb:FilterGroupItem>
+        <fb:FilterGroupItem name="Project" label="Project" groupName="Group1" visibleInFilterBar="true">
+            <fb:control>
+                <HBox>
+                    <MultiComboBox  placeholder="Select one or more projects" width="500%" name="Category" selectionChange=".onSelectionChange" items="{ path: '/ProductCategories', templateShareable: true }">
+                        <core:Item key="{key}" text="{name}"/> 
+                    </MultiComboBox>
+                </HBox>
+            </fb:control>
+        </fb:FilterGroupItem>
+
+        <!-- Second Line -->
+        <fb:FilterGroupItem name="Definition" label="Definition" groupName="Group1" visibleInFilterBar="true"> 
+            <fb:control>
+                
+                    <HBox>
+                        <MultiComboBox id="definitionid" placeholder="Select one or more definitions" width="500%" name="Definition" selectionChange=".onSelectionChange"  value="" items="{ path: 'dataModel>/', templateShareable: true }">
+                            <core:Item text="{dataModel>name}"/>    
+                        </MultiComboBox>    
+                    </HBox>   
+                     </fb:control>
+        </fb:FilterGroupItem>
+         <fb:FilterGroupItem name="Tenant" label="Tenant" groupName="Group1" visibleInFilterBar="true"> 
+            <fb:control>
+                
+                    <HBox> 
+
+                        <MultiComboBox placeholder="Select one or more Tenant" width="" name="Tenant" selectionChange=".onSelectionChange" items="{ path: '/ProductSuppliers', templateShareable: true }">
+                            <core:Item key="{key}" text="{name}"/> 
+                        </MultiComboBox> 
+                        </HBox>
+                
+            </fb:control>
+        </fb:FilterGroupItem> 
+                <fb:FilterGroupItem name="Completed After" groupName="Group0" label="Completed After" visibleInFilterBar="false">
+            <fb:control>
+                <DateTimePicker id="completedAfterDatePicker" placeholder="Select Completed After Date" />
+            </fb:control>
+        </fb:FilterGroupItem>
+
+        <fb:FilterGroupItem name="Completed Before" groupName="Group0" label="Completed Before" visibleInFilterBar="false">
+            <fb:control>
+                <DateTimePicker id="completedBeforeDatePicker" placeholder="Select Completed Before Date" />
+            </fb:control>
+        </fb:FilterGroupItem>
+
+        <fb:FilterGroupItem name="Hierarchial level" groupName="Group0" label="Hierarchial Level" visibleInFilterBar="false">
+            <fb:control>
+                <!-- Assuming Hierarchical level uses a DatePicker as an example; you might need another control -->
+                <MultiComboBox id="hierarchicalLevelDatePicker" placeholder="Select Hierarchial Level" />
+            </fb:control>
+        </fb:FilterGroupItem>
+
+        <fb:FilterGroupItem name="Instance ID" groupName="Group0" label="Instance ID" visibleInFilterBar="false">
+            <fb:control>
+                <SearchField id="instanceIDDatePicker" placeholder="Select Instance ID Date" />
+            </fb:control>
+        </fb:FilterGroupItem>
+
+        <fb:FilterGroupItem name="Started After" groupName="Group0" label="Started After" visibleInFilterBar="false">
+            <fb:control>
+                <DateTimePicker id="startedAfterDatePicker" placeholder="Select Started After Date" />
+            </fb:control>
+        </fb:FilterGroupItem> 
+
+        <fb:FilterGroupItem name="Started Before" groupName="Group0" label="Started Before" visibleInFilterBar="false">
+            <fb:control>
+                <SearchField id="startedBeforeDatePicker" placeholder="Select Started Before Date" />
+            </fb:control>  
+        </fb:FilterGroupItem>
+
+        <fb:FilterGroupItem name="Started By" groupName="Group0" label="Started By" visibleInFilterBar="false">
+            <fb:control>
+                <DateTimePicker id="startedByDatePicker" placeholder="Select Started By Date" />
+            </fb:control>
+        </fb:FilterGroupItem> 
+    </fb:filterGroupItems>
+</fb:FilterBar> 
+                    </f:content>
+                </f:DynamicPageHeader> 
+            </f:header>            
+            <f:content>
+             <VBox id="mainContent">
+                  <Table id="idProductsTable"
+               mode="None"  
+               sticky="HeaderToolbar,ColumnHeaders"
+               inset="false"
+               items="{instanceModel>/instances}"
+               class="sapFDynamicPageAlignContent"
+               width="auto"
+               alternateRowColors="true">   
+            <headerToolbar> 
+                <Toolbar>
+
+                    <Title text="{= 'Items(' + ${instanceModel>/}.length + ')'}" level="H2"/> 
+                    <ToolbarSpacer/>
+                       <Button icon="sap-icon://synchronize" press="onSynchronize" tooltip="Refresh Instances List"/>                       
+                        <Button text="Chart View" press="onShowChart" />
+                </Toolbar>
+            </headerToolbar>
+            <columns>
+                 <Column>
+                    <Text text="Type"/>
+                </Column>
+                <Column>
+                    <Text text="Process Name"/>
+                </Column>
+                <Column hAlign="Center">
+                    <Text text="Status" /> 
+                </Column>
+                <Column hAlign="Center">
+                    <Text text="Started At" />
+                </Column>
+                <Column hAlign="Center">
+                    <Text text="Execution Time" />  
+                </Column>
+               
+                <Column hAlign="Center">
+                    <Text text="Action" />  
+                </Column>
+                
+                <!-- <Column hAlign="Center">
+                     <FlexBox alignItems="Center">
+                            <Text text="Started on" />
+                            <core:Icon id="sortIcons" src="sap-icon://sort-descending" press="onSortToggle" class="sort-icon"/>
+                        </FlexBox>
+                </Column>  -->
+            </columns>
+            <items> 
+                <ColumnListItem type="Navigation" press="Fclayout">   
+                    <cells> 
+                        <Avatar src="sap-icon://process" displayShape="Square" backgroundColor="Accent7" class="icon-process" displaySize="XS"/>
+                        <Text text="{instanceModel>instance/subject}" /> 
+                        <!-- <Avatar src="sap-icon://process" displayShape="Square" backgroundColor="Accent7" class="icon-process" displaySize="XS"/>   -->
+                        <!-- <Text text="{Items>Status}" />  -->
+                       <!-- <ObjectStatus class="ObjectStatusforStatus" text="{ parts:[{path:'Items>Status'}], formatter:'.formatter.caplock'}" state="{path:'Items>Status',formatter:'.formatter.onAdd'}" inverted="true"/> -->
+                        <!-- <ObjectStatus class="ObjectStatusforStatus" text="{ parts:[{path:'instanceModel>status'}], formatter:'.formatter.caplock'}" state="{path:'instanceModel>status',formatter:'.formatter.onAdd'}" inverted="true"/>  -->
+                        <ObjectStatus
+                          class="ObjectStatusforStatus"
+                          text="{instanceModel>instance/status}"
+                          state="{path: 'instanceModel>instance/status', formatter: '.formatter.onAdd'}"
+                          inverted="true"/>
+                          <Text text="{path: 'instanceModel>instance/startedAt', formatter: '.formatter.formatDate'}"/>
+                        <!-- <Text text="{path: 'yourModel>startedAt', formatter: '.formatter.formatDate'}" /> -->
+                        <!-- <Text text="{instanceModel>instance/startedAt}" />  -->
+                        <Text text="{instanceModel>duration}" /> 
+                        <!-- <Text text="{Items>Error Count}" />     -->
+                        
+                        <!-- <Text text=" { parts:[{path:'instanceModel>startedAt'}], formatter:'.formatter.formatDate'}  " />      -->
+                        
+                        <Button text="Show Log" type="Emphasized" press="onOpenDialog" />
+
+                    </cells> 
+                </ColumnListItem> 
+            </items>  
+        </Table> 
+               <VBox id="chartContainer" visible="false">
+               <Button text="Back to Table" press="onShowTable" />
+              <!-- <viz:VizFrame id="idVizFrame" uiConfig="{applicationSet:'fiori'}"  width="100%" height="500px">
+            <viz:dataset>
+                <viz.data:FlattenedDataset data="{instanceModel>/}">
+                    <viz.data:dimensions>
+                        <viz.data:DimensionDefinition name="Process Name" value="{instanceModel>instance/subject}" />
+                    </viz.data:dimensions>
+                    <viz.data:measures>
+                        <viz.data:MeasureDefinition name="Execution Time" value="{instanceModel>duration}" />
+                    </viz.data:measures>
+                </viz.data:FlattenedDataset>
+            </viz:dataset>
+            <viz:feeds>
+                    <viz.feeds:FeedItem id='categoryAxis' uid="categoryAxis" type="Dimension"
+                        values="Process Name" />
+                    <viz.feeds:FeedItem uid="valueAxis" type="Measure"
+                        values="Execution Time" />
+                  </viz:feeds>
+           </viz:VizFrame> -->
+
+           <viz:VizFrame id="idVizFrame"
+             height="500px"
+             width="100%"
+             selectData="onBarSelect"
+             uiConfig="{applicationSet:'fiori'}"
+             visible="true"
+             >
+    <viz:dataset>
+        <!-- <viz.data:FlattenedDataset data="{Items>/Products}"> -->
+        <viz.data:FlattenedDataset data="{instanceModel>/instances}">
+            <viz.data:dimensions>
+                <!-- Dimension for Process Name -->
+                <viz.data:DimensionDefinition name="Process Name" value="{instanceModel>instance/subject}" />
+                  <!-- <viz.data:DimensionDefinition name="Process Name" value="{Items>Process Name}" /> -->
+            </viz.data:dimensions>
+            <viz.data:measures>
+                <!-- Measure for Execution Time -->
+                <!-- <viz.data:MeasureDefinition name="Execution Time" value="{instanceModel>duration}" /> -->
+                 <viz.data:MeasureDefinition name="Execution Time (In Hrs)" 
+              value="{path: 'instanceModel>duration', formatter: '.formatter.convertDurationToHours'}" />
+                <!-- <viz.data:MeasureDefinition name="Execution Time" value="{Items>Error Count}" /> -->
+            </viz.data:measures>
+        </viz.data:FlattenedDataset>
+    </viz:dataset>
+    <viz:feeds>
+        <!-- Feed for Execution Time Measure -->
+        <viz.feeds:FeedItem uid="valueAxis" type="Measure" values="Execution Time (In Hrs)" />
+        <!-- Feed for Process Name Dimension -->
+        <viz.feeds:FeedItem uid="categoryAxis" type="Dimension" values="Process Name" />
+    </viz:feeds>
+</viz:VizFrame>
+<viz:Popover id="idPopOver"/>
+
+                                </VBox>
+         </VBox>
+            </f:content>
+            <!-- DynamicPage Footer --> 
+        </f:DynamicPage>
+    </f:beginColumnPages>   
+</f:FlexibleColumnLayout>
+      </tnt:mainContents>
+    </tnt:ToolPage> 
+
+    <!-- <Dialog id="newDetailDialog" title="{parts: [
+                                                                {path: 'logData>type'},
+                                                                {path: 'logData>userId'},
+                                                                {path: 'logData>subject'}
+                                                            ],
+                                                            formatter: '.formatMessage'}">
+        <content>
+            <VBox>
+                <Text text="This is a dialog for displaying product details." />
+                <Input id="productNameInput" placeholder="Enter product name" />
+                <Input id="productPriceInput" placeholder="Enter product price" />
+            </VBox>
+        </content>
+        
+        <endButton>
+            <Button text="Cancel" press="onClosePress" />
+        </endButton>
+    </Dialog>  -->
+    <!-- </Page> -->
+</mvc:View>
+
+
+
+
+
+
+
+
+
+

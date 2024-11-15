@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="4.0" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+    <edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/Common.xml">
+        <edmx:Include Alias="Common" Namespace="com.sap.vocabularies.Common.v1"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="https://oasis-tcs.github.io/odata-vocabularies/vocabularies/Org.OData.Core.V1.xml">
+        <edmx:Include Alias="Core" Namespace="Org.OData.Core.V1"/>
+    </edmx:Reference>
+    <edmx:DataServices>
+        <Schema Namespace="ExternalService" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <Annotation Term="Core.Links">
+                <Collection>
+                    <Record>
+                        <PropertyValue Property="rel" String="author"/>
+                        <PropertyValue Property="href" String="https://cap.cloud.sap"/>
+                    </Record>
+                </Collection>
+            </Annotation>
+            <EntityContainer Name="EntityContainer">
+                <ActionImport Name="getDestination" Action="ExternalService.getDestination"/>
+                <ActionImport Name="postDestination" Action="ExternalService.postDestination"/>
+                <ActionImport Name="updateDestination" Action="ExternalService.updateDestination"/>
+                <ActionImport Name="deleteDestination" Action="ExternalService.deleteDestination"/>
+            </EntityContainer>
+            <Action Name="getDestination" IsBound="false">
+                <ReturnType Type="Collection(Edm.String)" Nullable="true"/>
+            </Action>
+            <Action Name="postDestination" IsBound="false">
+                <Parameter Name="Type" Type="Edm.String"/>
+                <Parameter Name="clientId" Type="Edm.String"/>
+                <Parameter Name="HTML5DynamicDestination" Type="Edm.Boolean"/>
+                <Parameter Name="Authentication" Type="Edm.String"/>
+                <Parameter Name="Name" Type="Edm.String"/>
+                <Parameter Name="WebIDEEnabled" Type="Edm.Boolean"/>
+                <Parameter Name="tokenServiceURL" Type="Edm.String"/>
+                <Parameter Name="ProxyType" Type="Edm.String"/>
+                <Parameter Name="URL" Type="Edm.String"/>
+                <Parameter Name="tokenServiceURLType" Type="Edm.String"/>
+                <Parameter Name="clientSecret" Type="Edm.String"/>
+                <ReturnType Type="Edm.String"/>
+            </Action>
+            <Action Name="updateDestination" IsBound="false">
+                <Parameter Name="Type" Type="Edm.String"/>
+                <Parameter Name="clientId" Type="Edm.String"/>
+                <Parameter Name="HTML5DynamicDestination" Type="Edm.Boolean"/>
+                <Parameter Name="Authentication" Type="Edm.String"/>
+                <Parameter Name="Name" Type="Edm.String"/>
+                <Parameter Name="WebIDEEnabled" Type="Edm.Boolean"/>
+                <Parameter Name="tokenServiceURL" Type="Edm.String"/>
+                <Parameter Name="ProxyType" Type="Edm.String"/>
+                <Parameter Name="URL" Type="Edm.String"/>
+                <Parameter Name="tokenServiceURLType" Type="Edm.String"/>
+                <Parameter Name="clientSecret" Type="Edm.String"/>
+                <ReturnType Type="Edm.String"/>
+            </Action>
+            <Action Name="deleteDestination" IsBound="false">
+                <Parameter Name="Name" Type="Edm.String"/>
+                <ReturnType Type="Edm.String"/>
+            </Action>
+        </Schema>
+    </edmx:DataServices>
+</edmx:Edmx>

@@ -1,0 +1,95 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:uxap="sap.uxap" fragmentName="detaillogsapp.view.ShowLogs" type="XML">
+    <Dialog id="newproductdialog" 
+            title="Detail Logs" 
+            contentWidth="760px"
+            contentHeight="450px"
+            resizable="true"
+            draggable="true"
+            verticalScrolling="true" >
+        
+        <uxap:ObjectPageLayout preserveHeaderStateOnScroll="true" upperCaseAnchorBar="false">  
+            <uxap:headerContent>
+                <!-- First HBox for Execution Time aligned to the left and Definition aligned to the right -->
+                <HBox justifyContent="SpaceBetween" alignItems="Center">
+                    <VBox>
+                        <Panel expandable="false">
+                            <VBox>                              
+                                <Label text="Process Name:"/>  
+                                <!-- <Text text="{instanceModel>/subject}"/>    -->
+                                <Text text="{logData>/subject}" />
+                            </VBox>
+                        </Panel>
+                    </VBox>
+                    
+                    <!-- Spacer to push content to the opposite corners -->
+                    <ToolbarSpacer/>
+                    
+                    <VBox>
+                        <Panel expandable="false">
+                            <VBox>
+                                <Label text="Status:"/>
+                                <!-- <Text text="{instanceModel>/status}"/> -->
+                                <Text text="{logData>/status}" /> 
+                            </VBox>
+                        </Panel>
+                    </VBox>
+                </HBox>
+            </uxap:headerContent>
+        </uxap:ObjectPageLayout>
+
+        <!-- Table below the header content -->
+        <Table id="DetailsTable"
+               mode="None"  
+               sticky="HeaderToolbar,ColumnHeaders"
+               inset="false"
+               items="{logData>/logs}"
+               class="sapFDynamicPageAlignContent"
+               width="auto"
+               alternateRowColors="true">   
+            <headerToolbar> 
+                <Toolbar>
+                    <ToolbarSpacer/>
+                    <Button icon="sap-icon://synchronize" press="onSynchronize" tooltip="Refresh Instances List"/>
+                </Toolbar>
+            </headerToolbar>
+            <columns>
+                <Column>
+                    <Text text="Time"/>
+                </Column>
+                <Column>
+                    <Text text="Type"/>
+                </Column>  
+                <Column>
+                    <Text text="Message"/>
+                </Column>
+                <Column>
+                  <Text text="Action"/>
+               </Column>
+            </columns>
+            <items> 
+                <ColumnListItem press="Fclayout">   
+                    <cells> 
+                        <Text text="{path: 'logData>timestamp', formatter: '.formatter.formatdate'}" /> 
+                        <Text text="{logData>type}" />
+                        <Text text="{parts: [
+                                        {path: 'logData>type'},
+                                        {path: 'logData>userId'},
+                                        {path: 'logData>subject'}
+                                    ], formatter: '.formatMessage'}"/>
+                       <Button 
+                        type="Emphasized" 
+                        icon="sap-icon://detail-view" 
+                        press="onDetailPress" />                                  
+                    </cells> 
+                </ColumnListItem> 
+            </items>  
+        </Table> 
+
+        <beginButton>
+            <Button type="Emphasized" text="OK" press="onClosePress" />
+        </beginButton>
+        <!-- <endButton>
+            <Button text="Close" press="onClosePress" />
+        </endButton> -->
+    </Dialog>
+</core:FragmentDefinition>

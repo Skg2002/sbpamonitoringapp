@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="4.0" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+    <edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/Common.xml">
+        <edmx:Include Alias="Common" Namespace="com.sap.vocabularies.Common.v1"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="https://oasis-tcs.github.io/odata-vocabularies/vocabularies/Org.OData.Core.V1.xml">
+        <edmx:Include Alias="Core" Namespace="Org.OData.Core.V1"/>
+    </edmx:Reference>
+    <edmx:DataServices>
+        <Schema Namespace="WorkflowService" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+            <EntityContainer Name="EntityContainer">
+                <EntitySet Name="WorkflowInstances" EntityType="WorkflowService.WorkflowInstances"/>
+                <EntitySet Name="WorkflowDefinitions" EntityType="WorkflowService.WorkflowDefinitions"/>
+                <EntitySet Name="ExecutionLogs" EntityType="WorkflowService.ExecutionLogs"/>
+                <EntitySet Name="TaskInstances" EntityType="WorkflowService.TaskInstances"/>
+                <ActionImport Name="getWorkflowInstanceById" Action="WorkflowService.getWorkflowInstanceById"/>
+                <FunctionImport Name="fetchContext" Function="WorkflowService.fetchContext"/>
+                <FunctionImport Name="fetchExecutionLogs" Function="WorkflowService.fetchExecutionLogs"/>
+                <FunctionImport Name="fetchError" Function="WorkflowService.fetchError"/>
+                <ActionImport Name="getfilteration" Action="WorkflowService.getfilteration"/>
+                <ActionImport Name="getRunningHold" Action="WorkflowService.getRunningHold"/>
+                <ActionImport Name="getTaskInstances" Action="WorkflowService.getTaskInstances"/>
+                <ActionImport Name="getProcessor" Action="WorkflowService.getProcessor"/>
+            </EntityContainer>
+            <EntityType Name="WorkflowInstances">
+                <Key>
+                    <PropertyRef Name="id"/>
+                </Key>
+                <Property Name="id" Type="Edm.String" Nullable="false"/>
+                <Property Name="definitionId" Type="Edm.String"/>
+                <Property Name="definitionVersion" Type="Edm.String"/>
+                <Property Name="subject" Type="Edm.String"/>
+                <Property Name="status" Type="Edm.String"/>
+                <Property Name="businessKey" Type="Edm.String"/>
+                <Property Name="parentInstanceId" Type="Edm.String"/>
+                <Property Name="rootInstanceId" Type="Edm.String"/>
+                <Property Name="applicationScope" Type="Edm.String"/>
+                <Property Name="projectId" Type="Edm.String"/>
+                <Property Name="projectVersion" Type="Edm.String"/>
+                <Property Name="environmentId" Type="Edm.String"/>
+                <Property Name="startedBy" Type="Edm.String"/>
+                <Property Name="completedAt" Type="Edm.DateTimeOffset"/>
+                <Property Name="startedAt" Type="Edm.DateTimeOffset"/>
+                <Property Name="cascade" Type="Edm.Boolean"/>
+            </EntityType>
+            <EntityType Name="WorkflowDefinitions">
+                <Key>
+                    <PropertyRef Name="id"/>
+                </Key>
+                <Property Name="id" Type="Edm.String" Nullable="false"/>
+                <Property Name="version" Type="Edm.String"/>
+                <Property Name="name" Type="Edm.String"/>
+                <Property Name="createdBy" Type="Edm.String"/>
+                <Property Name="createdAt" Type="Edm.DateTimeOffset"/>
+                <Property Name="applicationScope" Type="Edm.String"/>
+                <Property Name="projectId" Type="Edm.String"/>
+                <Property Name="projectVersion" Type="Edm.String"/>
+                <Property Name="environmentId" Type="Edm.String"/>
+            </EntityType>
+            <EntityType Name="ExecutionLogs">
+                <Key>
+                    <PropertyRef Name="id"/>
+                </Key>
+                <Property Name="id" Type="Edm.String" Nullable="false"/>
+                <Property Name="type" Type="Edm.String"/>
+                <Property Name="timestamp" Type="Edm.DateTimeOffset"/>
+                <Property Name="referenceInstanceId" Type="Edm.String"/>
+                <Property Name="userId" Type="Edm.String"/>
+                <Property Name="activityId" Type="Edm.String"/>
+                <Property Name="subject" Type="Edm.String"/>
+                <Property Name="automationTask" Type="Collection(Edm.String)" Nullable="false"/>
+            </EntityType>
+            <EntityType Name="TaskInstances">
+                <Property Name="activityId" Type="Edm.String"/>
+                <Property Name="claimedAt" Type="Edm.DateTimeOffset"/>
+                <Property Name="completedAt" Type="Edm.DateTimeOffset"/>
+                <Property Name="createdAt" Type="Edm.DateTimeOffset"/>
+                <Property Name="description" Type="Edm.String"/>
+                <Property Name="id" Type="Edm.Guid"/>
+                <Property Name="processor" Type="Edm.String"/>
+                <Property Name="recipientUsers" Type="Collection(Edm.String)" Nullable="false"/>
+                <Property Name="recipientGroups" Type="Collection(Edm.String)" Nullable="false"/>
+                <Property Name="status" Type="Edm.String"/>
+                <Property Name="subject" Type="Edm.String"/>
+                <Property Name="workflowDefinitionId" Type="Edm.String"/>
+                <Property Name="workflowInstanceId" Type="Edm.String"/>
+                <Property Name="priority" Type="Edm.String"/>
+                <Property Name="dueDate" Type="Edm.DateTimeOffset"/>
+                <Property Name="createdBy" Type="Edm.String"/>
+                <Property Name="definitionId" Type="Edm.String"/>
+                <Property Name="lastChangedAt" Type="Edm.DateTimeOffset"/>
+                <Property Name="applicationScope" Type="Edm.String"/>
+            </EntityType>
+            <Action Name="getWorkflowInstanceById" IsBound="false">
+                <Parameter Name="id" Type="Edm.String"/>
+                <ReturnType Type="Edm.String"/>
+            </Action>
+            <Function Name="fetchContext" IsBound="false" IsComposable="false">
+                <Parameter Name="id" Type="Edm.String"/>
+                <ReturnType Type="Edm.String"/>
+            </Function>
+            <Function Name="fetchExecutionLogs" IsBound="false" IsComposable="false">
+                <Parameter Name="id" Type="Edm.String"/>
+                <ReturnType Type="Edm.String"/>
+            </Function>
+            <Function Name="fetchError" IsBound="false" IsComposable="false">
+                <Parameter Name="id" Type="Edm.String"/>
+                <ReturnType Type="Edm.String"/>
+            </Function>
+            <Action Name="getfilteration" IsBound="false">
+                <Parameter Name="status" Type="Edm.String"/>
+                <Parameter Name="containsText" Type="Edm.String"/>
+                <Parameter Name="definitionId" Type="Edm.String"/>
+                <Parameter Name="startedBy" Type="Edm.String"/>
+                <Parameter Name="startedFrom" Type="Edm.String"/>
+                <Parameter Name="startedUpTo" Type="Edm.String"/>
+                <Parameter Name="completedFrom" Type="Edm.String"/>
+                <Parameter Name="completedUpTo" Type="Edm.String"/>
+                <Parameter Name="projectId" Type="Edm.String"/>
+                <Parameter Name="id" Type="Edm.String"/>
+                <ReturnType Type="Collection(Edm.String)" Nullable="false"/>
+            </Action>
+            <Action Name="getRunningHold" IsBound="false">
+                <Parameter Name="id" Type="Edm.String"/>
+                <Parameter Name="status" Type="Edm.String"/>
+                <ReturnType Type="Collection(Edm.String)" Nullable="false"/>
+            </Action>
+            <Action Name="getTaskInstances" IsBound="false">
+                <Parameter Name="workflowInstanceId" Type="Edm.String"/>
+                <ReturnType Type="Collection(Edm.String)" Nullable="false"/>
+            </Action>
+            <Action Name="getProcessor" IsBound="false">
+                <Parameter Name="id" Type="Edm.String"/>
+                <Parameter Name="processor" Type="Edm.String"/>
+                <Parameter Name="status" Type="Edm.String"/>
+                <ReturnType Type="Collection(Edm.String)" Nullable="false"/>
+            </Action>
+        </Schema>
+    </edmx:DataServices>
+</edmx:Edmx>

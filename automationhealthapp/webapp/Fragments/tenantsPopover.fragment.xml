@@ -1,0 +1,30 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+   <Popover
+    id="valueHelpPopover"
+    title="Tenants"
+    placement="Bottom"
+    afterClose="_handlePopoverClose">
+    <List
+        items="{wfModel>/Destinations}"
+        id="idList"
+        mode="MultiSelect"
+        selectionChange="_handleSelectionChange">
+        <StandardListItem
+            title="{wfModel>display_Name}"
+            description="{wfModel>dest_name}" />
+    </List>
+    <footer>
+      <Toolbar>
+      <ToolbarSpacer />
+    <Button
+        text="OK"
+        id="OkId"
+        type="Emphasized"
+        press="_handlePopoverOk" />
+    <Button
+        text="Cancel"
+        press="_handlePopoverCancel" />
+        </Toolbar>
+        </footer>
+</Popover>
+</core:FragmentDefinition>

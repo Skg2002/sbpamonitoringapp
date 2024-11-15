@@ -1,0 +1,32 @@
+
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:uxap="sap.uxap"
+    fragmentName="detaillogsapp.fragments.ShowLogsDetail"
+    type="XML">
+    
+    <Dialog id="detailproductdialog" 
+            title="{dialogData>/type}" 
+            draggable="true"
+            verticalScrolling="true" >
+        <content>
+        <VBox>
+        <Label text="Started At"></Label>
+        <!-- <Text text="{dialogData>/timestamp, formatter: '.formatter.formatdate'}"/> -->
+        <Text text="{path: 'dialogData>/timestamp', formatter: '.formatter.formatdate'}" /> 
+
+         <Label text="Automation Job Data"></Label>
+           <Text text="{dialogData>/referenceInstanceId}"/>
+         <Label text="User ID"></Label>
+          <Text text="{dialogData>/userId}"/>
+          </VBox>
+        </content>
+       
+
+        <beginButton>
+            <Button type="Emphasized" text="OK" press="onOKPress" />
+        </beginButton>
+
+    </Dialog>
+</core:FragmentDefinition>

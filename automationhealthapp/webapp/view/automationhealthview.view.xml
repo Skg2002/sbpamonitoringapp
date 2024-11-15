@@ -1,0 +1,377 @@
+<mvc:View xmlns:mvc="sap.ui.core.mvc"
+          xmlns="sap.m"
+          xmlns:core="sap.ui.core"
+          xmlns:viz="sap.viz.ui5.controls"
+          xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds"
+          xmlns:viz.data="sap.viz.ui5.data"
+          xmlns:f="sap.f"
+          xmlns:fb="sap.ui.comp.filterbar"
+          controllerName="automationhealthapp.controller.automationhealthview"
+          xmlns:json="http://www.w3.org/2005/Atom"
+          xmlns:card="sap.f.cards"
+          xmlns:controls="sap.ui.core.Control"
+          xmlns:layout="sap.ui.layout"
+           >
+
+    <!-- Dynamic Page Layout -->
+      <!-- <MessageStrip 
+                    id="warningMessageStripp" 
+                    text="Please note that the data may take a few seconds to load. If you encounter any issues, try refreshing the page." 
+                    type="Warning" 
+                    showCloseButton="true"
+                    showIcon="true"
+                    visible="true"
+                    class="sapUiSmallMargin"/> -->
+    <f:DynamicPage id="dynamicPage" backgroundDesign="Solid">
+
+    <!-- <MessageStrip 
+            id="warningMessageStripp" 
+            text="{appModel>/botMessage/value/0/message/tenantMessage}" 
+            type="Warning" 
+            showCloseButton="true"
+            showIcon="true"
+            visible="true"
+            class="sapUiSmallMargin"/> -->
+        <!-- Page Title -->
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <VBox>
+                        <Title text="Analytics Application" wrapping="true"/>
+                    </VBox>
+                </f:heading>
+            </f:DynamicPageTitle>
+        </f:title>
+
+        <!-- Header with FilterBar -->
+        <f:header>
+            <f:DynamicPageHeader pinnable="false">
+                <f:content>
+                <VBox items="{appModel>/botMessage}">
+                <MessageStrip 
+            id="warningMessageStrip" 
+            text="{appModel>message/tenantMessage}" 
+            type="Warning" 
+            showCloseButton="true"
+            showIcon="true"
+            visible="{appModel>message/needAdditionalAgent}"
+            class="sapUiSmallMargin"/>
+                </VBox>
+                
+                    <fb:FilterBar id="filterBar" useToolbar="false" showClearOnFB="false" 
+                                   showRestoreOnFB="false"  
+                                    showFilterConfiguration="false"
+                                   showGoOnFB="false">
+                        <!-- Date Range Selection -->
+                        <fb:filterGroupItems>  
+                         <fb:FilterGroupItem name="Date" groupName="Group0" label="Date" visibleInFilterBar="true">
+                          <fb:control> 
+                        <DateRangeSelection
+                            id="dateTimePicker"
+                            change="onDateChange"
+                            displayFormat="yyyy-MM-dd"
+                            valueFormat="yyyy-MM-dd"
+                            value="{/selectedDateTime}"
+                            width="20%"
+                            placeholder="Select Date and Time"/>
+                            </fb:control> 
+                             </fb:FilterGroupItem>
+
+
+                          <fb:FilterGroupItem name="Tenant" groupName="Group0" label="Tenant" visibleInFilterBar="true">
+                          <fb:control> 
+                            <!-- <MultiComboBox
+                                id="tenantBox"
+                                width="20%"
+                                placeholder="Select SBPA Tenants"
+                                selectionChange="onTenantChange"  
+                                class="sapUiSmallMarginBottom"
+                                items="{destinationModel>/}">
+                                <core:ListItem key="{destinationModel>dest_name}" text="{destinationModel>display_Name}" />
+                            </MultiComboBox> -->
+
+                            <MultiInput width="100%" id="multiInput"
+                                        value=""
+                                        suggestionItems="{
+                                            path: 'wfModel>/Destinations',
+                                            sorter: { path: 'wfModel>display_Name' }
+                                        }"
+                                        valueHelpRequest="handleValueHelp"
+                                        tokenUpdate="onTokenUpdate">
+                                <core:Item key="{wfModel>dest_name}" text="{wfModel>display_Name}" />
+                            </MultiInput>
+                            </fb:control> 
+                             </fb:FilterGroupItem>
+
+                        <!-- MultiComboBox for Status Filtration -->
+                        <fb:FilterGroupItem name="Status" groupName="Group0" label="Status" visibleInFilterBar="true">
+                          <fb:control> 
+                        <MultiComboBox 
+                            placeholder="Select one or more status" 
+                            width="20%" 
+                            id="myMultiComboBoxs" 
+                            selectedKeys="ERRONEOUS,RUNNING,SUSPENDED,COMPLETED,CANCELED" 
+                            selectionChange=".onSelectionChange">
+                            <core:Item key="CANCELED" text="Canceled"/>   
+                            <core:Item key="COMPLETED" text="Completed"/>
+                            <core:Item key="ERRONEOUS" text="Erroneous"/>    
+                            <core:Item key="RUNNING" text="Running"/>
+                            <core:Item key="SUSPENDED" text="Suspended"/>               
+                        </MultiComboBox>
+                         </fb:control> 
+                        </fb:FilterGroupItem >
+                        </fb:filterGroupItems>  
+                    </fb:FilterBar>
+                </f:content>
+            </f:DynamicPageHeader>
+        </f:header>
+
+        <!-- Dynamic Page Content -->
+        <f:content>
+            <VBox>
+                <!-- Message Strip -->
+                <!-- <MessageStrip 
+                    id="warningMessageStrip" 
+                    text="{appModel>/botMessage/value/0/message/tenantMessage}" 
+                    type="Warning" 
+                    showCloseButton="true"
+                    showIcon="true"
+                    visible="true"
+                    class="sapUiSmallMargin"/> -->
+
+                <!-- Scroll Container -->
+                <ScrollContainer horizontal="false" vertical="true" height="100%">
+                    <IconTabBar>
+                        <items>
+                            <IconTabFilter text="Overview" key="overview" icon="sap-icon://overview-chart">
+                                <VBox width="100%" justifyContent="SpaceAround">
+                                    <!-- Overview Counts -->
+                                    <HBox justifyContent="SpaceAround" width="100%">
+                                        <VBox alignItems="Center">
+                                            <Text text="Failed Requests" class="headerText"/>
+                                            <Text text="{pieModel>/ErroneousCount}" class="textCritical"/>
+                                        </VBox>
+                                        <VBox alignItems="Center">
+                                            <Text text="Total Requests" class="headerText"/>
+                                            <Text text="{lineModel>/TotalLogs}" class="textNeutral"/>
+                                        </VBox>
+                                        <VBox alignItems="Center">
+                                            <Text text="Running Requests" class="headerText"/>
+                                            <Text text="{pieModel>/RunningCount}" class="textNeutral"/>
+                                        </VBox>
+                                        <VBox alignItems="Center">
+                                            <Text text="Completed Requests" class="headerText"/>
+                                            <Text text="{pieModel>/CompletedCount}" class="textCompleted"/>
+                                        </VBox>
+                                        <VBox alignItems="Center">
+                                            <Text text="Canceled Requests" class="headerText"/>
+                                            <Text text="{pieModel>/CanceledCount}" class="textNeutral"/>
+                                        </VBox>
+                                        <VBox alignItems="Center">
+                                            <Text text="Suspended Requests" class="headerText"/>
+                                            <Text text="{pieModel>/SuspendedCount}" class="textNeutral"/>
+                                        </VBox>
+                                    </HBox>
+                                    
+                                    <VBox height="20px"/> <!-- Add height to create space -->
+                                    <HBox justifyContent="SpaceAround" width="100%">
+                                        <!-- Line Chart -->
+                                        <VBox width="45%">
+                                            <viz:VizFrame id="idLineChart" vizType="line" height="400px" width="100%" >
+                                                <viz:dataset>
+                                                    <viz.data:FlattenedDataset data="{lineModel>/LineData}">
+                                                        <viz.data:dimensions>
+                                                            <viz.data:DimensionDefinition name="Timestamp" value="{lineModel>Timestamp}"/>
+                                                        </viz.data:dimensions>
+                                                        <viz.data:measures>
+                                                            <viz.data:MeasureDefinition name="Process Count" value="{lineModel>ProcessCount}"/>
+                                                        </viz.data:measures>
+                                                    </viz.data:FlattenedDataset>
+                                                </viz:dataset>
+                                                <viz:feeds>
+                                                    <viz.feeds:FeedItem uid="categoryAxis" type="Dimension" values="Timestamp"/>
+                                                    <viz.feeds:FeedItem uid="valueAxis" type="Measure" values="Process Count"/>
+                                                </viz:feeds>
+                                               
+                                            </viz:VizFrame>
+                                             <viz:Popover id="lineChartPopover" />
+                                        </VBox>
+
+                                        <!-- Pie Chart -->
+                                        <VBox width="45%">
+                                            <viz:VizFrame id="idVizFramePie" height="400px" width="100%" selectData="onPieSelect" uiConfig="{applicationSet:'fiori'}" visible="true" vizType="pie">
+                                                <viz:dataset>
+                                                    <viz.data:FlattenedDataset data="{pieModel>/PieData}">
+                                                        <viz.data:dimensions>
+                                                            <viz.data:DimensionDefinition name="Process Name" value="{pieModel>Status}"/>
+                                                        </viz.data:dimensions>
+                                                        <viz.data:measures>
+                                                            <viz.data:MeasureDefinition name="Error Count" value="{pieModel>Count}"/>
+                                                        </viz.data:measures>
+                                                    </viz.data:FlattenedDataset>
+                                                </viz:dataset>
+                                                <viz:feeds>
+                                                    <viz.feeds:FeedItem uid="size" type="Measure" values="Error Count"/>
+                                                    <viz.feeds:FeedItem uid="color" type="Dimension" values="Process Name"/>
+                                                </viz:feeds>
+                                                <!-- <viz:dependents>
+                                                    <viz:Popover id="idPopOver"/>
+                                                </viz:dependents> -->
+                                            </viz:VizFrame>
+                                        </VBox>
+                                    </HBox>
+                                </VBox>
+                            </IconTabFilter>
+
+                            <IconTabFilter text="Error Monitor" key="signals" icon="sap-icon://activity-items">
+                                   
+      <VBox>
+
+                        <!-- Top Controls (MultiInput and DateRangeSelection) -->
+                        <!-- <HBox class="ResponsiveGridLayout" justifyContent="Center">
+                            
+                            <DateRangeSelection id="dateRangeSelectorId"
+                                                displayFormat="long" 
+                                                change="onDateRangeChange" 
+                                                valueFormat="yyyy-MM-dd"
+                                                dateValue="{dateModel>/startDate}"
+                                                secondDateValue="{dateModel>/endDate}" width="20vw"/>
+                        </HBox> -->
+
+                        <!-- Grid Layout for Indicators and Charts -->
+                        <!-- <layout:Grid width="100%" hSpacing="1" vSpacing="1" visible="true"> -->
+                        <HBox backgroundDesign="Transparent">
+
+                            <!-- Left Column Content -->
+                            
+                                <VBox layoutData="layout:GridData" span="L3 M3 S12" class="indications">
+                                    <Text text="Error Code Indicators" class="sapUiSmallMarginBottom sapUiLargeFont indicatorSection"/>
+                                    <Text text="Failed Service Requests" class="sapUiTinyMarginBottom requestText"/>
+                                    <Text text="{errorCountModel>/totalCount}" class="sapUiTinyMarginBottom countrequest"/>
+
+                                    <!-- Status Code Table -->
+                                    <VBox class="errorcode">
+                                        <Text text="Status Code Distribution" class="sapUiTinyMarginBottom tableText"/>
+                                        <Table id="statusTable" items="{path: 'errorCountModel>/statusCounts'}" growing="true">
+                                            <columns>
+                                                <Column><Text text="Status Code" /></Column>
+                                                <Column><Text text="Count" /></Column>
+                                            </columns>
+                                            <items>
+                                                <ColumnListItem type="Active">
+                                                    <cells>
+                                                        <Text text="{errorCountModel>statusCode}"/>
+                                                        <Text text="{errorCountModel>count}" />
+                                                    </cells>
+                                                </ColumnListItem>
+                                            </items>
+                                        </Table>
+                                    </VBox>
+
+                                    <!-- Error Code Distribution Pie Chart -->
+                                    <Text text="Error Code Distribution" class="sapUiTinyMarginBottom errorText"/>
+                                    <viz:VizFrame id="idVizFrames" vizType="pie" height="300px" width="300px">
+                                        <viz:dataset>
+                                            <viz.data:FlattenedDataset data="{errorCountModel>/statusCounts}">
+                                                <viz.data:dimensions>
+                                                    <viz.data:DimensionDefinition name="Status Code" value="{errorCountModel>statusCode}" />
+                                                </viz.data:dimensions>
+                                                <viz.data:measures>
+                                                    <viz.data:MeasureDefinition name="Count" value="{errorCountModel>count}" />
+                                                </viz.data:measures>
+                                            </viz.data:FlattenedDataset>
+                                        </viz:dataset>
+                                        <viz:feeds>
+                                            <viz.feeds:FeedItem uid="size" type="Measure" values="Count" />
+                                            <viz.feeds:FeedItem uid="color" type="Dimension" values="Status Code" />
+                                        </viz:feeds>
+                                    </viz:VizFrame>
+                                </VBox>
+                          
+
+                            <!-- Right Column Content -->
+                            
+                                <VBox layoutData="layout:GridData" span="L6 M6 S12" class="indication">
+
+                                    <!-- Failed Automations and Failed Status Chart -->
+                                    <Text text="Failed Automations" class="sapUiSmallMarginBottom sapUiLargeFont textStatus"/>
+                                    <layout:Grid layoutData="layout:GridData" span="L12 M12 S12" hSpacing="1" vSpacing="1">
+                                        <layout:content>
+                                            <HBox>
+                                                <VBox alignContent="Center">
+                                                    <Text text="Total Failed Automations" class="sapUiTinyMarginBottom failedText"/>
+                                                    <Text text="{automationDetailsModel>/totalFailedCount}" class="sapUiTinyMarginBottom failedcount"/>
+                                                </VBox>
+                                                <VBox>
+                                                    <viz:VizFrame id="lineChart" vizType="line" height="300px" width="47vw" selectData="selected">
+                                                        <viz:dataset>
+                                                            <viz.data:FlattenedDataset data="{automationDetailsModel>/failedCounts}">
+                                                                <viz.data:dimensions>
+                                                                    <viz.data:DimensionDefinition axis="1" name="Start Time" value="{automationDetailsModel>startTime}" />
+                                                                </viz.data:dimensions>
+                                                                <viz.data:measures>
+                                                                    <viz.data:MeasureDefinition name="Failed Count" value="{automationDetailsModel>count}" />
+                                                                </viz.data:measures>
+                                                            </viz.data:FlattenedDataset>
+                                                        </viz:dataset>
+                                                        <viz:feeds>
+                                                            <viz.feeds:FeedItem uid="valueAxis" type="Measure" values="Failed Count" />
+                                                            <viz.feeds:FeedItem uid="categoryAxis" type="Dimension" values="Start Time" />
+                                                        </viz:feeds>
+                                                    </viz:VizFrame>
+                                                </VBox>
+                                            </HBox>
+                                        </layout:content>
+                                    </layout:Grid>
+
+                                    <!-- Automation Execution Times -->
+                                    <VBox layoutData="layout:GridData" span="L12 M12 S12">
+                                        <Text text="Automation Execution Times" class="sapUiSmallMarginBottom sapUiLargeFont responseText"/>
+                                        <layout:Grid layoutData="layout:GridData" span="L12 M12 S12" hSpacing="1" vSpacing="1">
+                                            <layout:content>
+                                                <VBox alignContent="Center">
+                                                    <Text text="Max Response Time" class="sapUiTinyMarginBottom responsetimeText"/>
+                                                    <Text text="{automationDetailsModel>/totalExecutionTime} s" class="sapUiTinyMarginBottom countresponse"/>
+                                                </VBox>
+                                                <VBox>
+                                                    <viz:VizFrame id="maxResponseTimeChart" height="450px" width="48vw">
+                                                        <viz:dataset>
+                                                            <viz.data:FlattenedDataset data="{automationDetailsModel>/completedStatusData}">
+                                                                <viz.data:measures>
+                                                                    <viz.data:MeasureDefinition name="Execution Time(sec)" value="{automationDetailsModel>duration}" />
+                                                                    <viz.data:MeasureDefinition name="Color" value="{automationDetailsModel>color}" />
+                                                                </viz.data:measures>
+                                                                <viz.data:dimensions>
+                                                                    <viz.data:DimensionDefinition name="DateTime" value="{automationDetailsModel>executionDate}" />
+                                                                </viz.data:dimensions>        
+                                                            </viz.data:FlattenedDataset>
+                                                        </viz:dataset>
+                                                        <viz:feeds>
+                                                            <viz.feeds:FeedItem uid="categoryAxis" type="Dimension" values="DateTime" />
+                                                            <viz.feeds:FeedItem uid="valueAxis" type="Measure" values="Execution Time(sec)" />
+                                                            <viz.feeds:FeedItem uid="colorAxis" type="Measure" values="Color" />
+                                                        </viz:feeds>
+                                                        <viz:dependents>
+                                                            <viz:Popover id="idPopOver"/>
+                                                        </viz:dependents>
+                                                    </viz:VizFrame>
+                                                </VBox>
+                                            </layout:content>
+                                        </layout:Grid>
+                                    </VBox>
+
+                                </VBox>
+                            
+</HBox>
+                        <!-- </layout:Grid> -->
+                    </VBox>
+                </IconTabFilter>
+
+                        </items>
+                    </IconTabBar>
+                </ScrollContainer>
+            </VBox>
+        </f:content>
+
+    </f:DynamicPage>
+</mvc:View>

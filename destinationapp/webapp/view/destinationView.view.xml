@@ -1,0 +1,104 @@
+<mvc:View
+    controllerName="destinationapp.controller.destinationView"
+    xmlns:mvc="sap.ui.core.mvc"
+    displayBlock="true"
+    xmlns:uxap="sap.uxap"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.f"
+    xmlns:layout="sap.ui.layout"
+    xmlns:fb="sap.ui.comp.filterbar"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:codeeditor="sap.ui.codeeditor"
+    xmlns:tnt="sap.tnt"
+>
+    <Page
+        id="page"
+    >
+        <content>
+            <form:SimpleForm
+                editable="true"
+                layout="ResponsiveGridLayout"
+                labelSpanXL="3"
+                labelSpanL="3"
+                labelSpanM="3"
+                labelSpanS="12"
+                adjustLabelSpan="false"
+                emptySpanXL="4"
+                emptySpanL="4"
+                emptySpanM="4"
+                emptySpanS="0"
+                columnsXL="1"
+                columnsL="1"
+                columnsM="1"
+            >
+                <Title
+                    text="Destination Configuration"
+                    level="H2"
+                />
+
+                <Label text="URL" />
+                <Input
+                    id="destURLInput"
+                    value="{destModel>/createDestinationData/dest_url}"
+                    placeholder="https://config.cfapps.us10.hana.ondemand.com"
+                    required="true"
+                    enabled="{destModel>/enabledData/dest_url}"
+                />
+
+                <Label text="Client Id" />
+                <Input
+                    id="clientIDInput"
+                    value="{destModel>/createDestinationData/client_ID}"
+                    placeholder=" Enter Client Id"
+                    required="true"
+                    enabled="{destModel>/enabledData/client_ID}"
+                />
+
+                <Label text="Client Secret" />
+                <Input
+                    id="clientSecretInput"
+                    value="{destModel>/createDestinationData/client_secret}"
+                    placeholder=" Enter Client Secret"
+                    required="true"
+                    enabled="{destModel>/enabledData/client_secret}"
+                    type="Password"
+                />
+
+                <Label text="Token Service URL" />
+                <Input
+                    id="tokenSrvURLInput"
+                    value="{destModel>/createDestinationData/token_srv_url}"
+                    placeholder="https://Subdomain.hana.ondemand.com"
+                    required="true"
+                    enabled="{destModel>/enabledData/token_srv_url}"
+                />
+            </form:SimpleForm>
+        </content>
+        <footer>
+            <OverflowToolbar>
+                <ToolbarSpacer />
+                <Button
+                    text="New"
+                    press="onClickNew"
+                    visible="{destModel>/enabledData/btnNew}"
+                />
+                <Button
+                    text="Save"
+                    press="onSaveDestination"
+                    enabled="{destModel>/enabledData/btnSave}"
+                />
+                <Button
+                    text="Create"
+                    press="onCreateDestination"
+                    enabled="{destModel>/enabledData/btnCreate}"
+                />
+                <Button
+                    text="Edit"
+                    press="onEditDestination"
+                    enabled="{destModel>/enabledData/btnEdit}"
+                />
+            </OverflowToolbar>
+        </footer>
+    </Page>
+</mvc:View>

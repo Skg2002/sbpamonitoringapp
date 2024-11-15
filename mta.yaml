@@ -1,0 +1,148 @@
+_schema-version: "3.2"
+ID: sbpamonitoringapp
+version: 0.0.1
+modules:
+- name: sbpamonitoringapp-destination-content
+  type: com.sap.application.content
+  requires:
+  - name: sbpamonitoringapp-destination-service
+    parameters:
+      content-target: true
+  - name: sbpamonitoringapp_html_repo_host
+    parameters:
+      service-key:
+        name: sbpamonitoringapp_html_repo_host-key
+  - name: uaa_sbpamonitoringapp
+    parameters:
+      service-key:
+        name: uaa_sbpamonitoringapp-key
+  parameters:
+    content:
+      instance:
+        destinations:
+        - Name: approuter_sbpamonitoringapp_html_repo_host
+          ServiceInstanceName: sbpamonitoringapp-html5-app-host-service
+          ServiceKeyName: sbpamonitoringapp_html_repo_host-key
+          sap.cloud.service: approuter
+        - Authentication: OAuth2UserTokenExchange
+          Name: approuter_uaa_sbpamonitoringapp
+          ServiceInstanceName: sbpamonitoringapp-xsuaa-service
+          ServiceKeyName: uaa_sbpamonitoringapp-key
+          sap.cloud.service: approuter
+        existing_destinations_policy: ignore
+  build-parameters:
+    no-source: true
+- name: sbpamonitoringapp-app-content
+  type: com.sap.application.content
+  path: .
+  requires:
+  - name: sbpamonitoringapp_html_repo_host
+    parameters:
+      content-target: true
+  build-parameters:
+    build-result: resources
+    requires:
+    - artifacts:
+      - workflowinstanceapp.zip
+      name: workflowinstanceapp
+      target-path: resources/
+    - artifacts:
+      - detaillogsapp.zip
+      name: detaillogsapp
+      target-path: resources/
+    - artifacts:
+      - automationhealthapp.zip
+      name: automationhealthapp
+      target-path: resources/
+    - artifacts:
+      - deletedinstanceslogsapp.zip
+      name: deletedinstanceslogsapp
+      target-path: resources/
+    - artifacts:
+      - destinationapp.zip
+      name: destinationapp
+      target-path: resources/
+- name: workflowinstanceapp
+  type: html5
+  path: workflowinstanceapp
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: detaillogsapp
+  type: html5
+  path: detail_logs_app
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: automationhealthapp
+  type: html5
+  path: automationhealthapp
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: deletedinstanceslogsapp
+  type: html5
+  path: deletedinstanceslogsapp
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: destinationapp
+  type: html5
+  path: destinationapp
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+resources:
+- name: sbpamonitoringapp-destination-service
+  type: org.cloudfoundry.managed-service
+  parameters:
+    config:
+      HTML5Runtime_enabled: true
+      init_data:
+        instance:
+          destinations:
+          - Authentication: NoAuthentication
+            Name: ui5
+            ProxyType: Internet
+            Type: HTTP
+            URL: https://ui5.sap.com
+          existing_destinations_policy: update
+      version: 1.0.0
+    service: destination
+    service-name: sbpamonitoringapp-destination-service
+    service-plan: lite
+- name: sbpamonitoringapp_html_repo_host
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: html5-apps-repo
+    service-name: sbpamonitoringapp-html5-app-host-service
+    service-plan: app-host
+- name: uaa_sbpamonitoringapp
+  type: org.cloudfoundry.managed-service
+  parameters:
+    path: ./xs-security.json
+    service: xsuaa
+    service-name: sbpamonitoringapp-xsuaa-service
+    service-plan: application
+parameters:
+  deploy_mode: html5-repo

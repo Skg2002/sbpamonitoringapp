@@ -1,0 +1,5 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+    <Popover id="errorPopover" title="Error Details" showHeader="false" placement="Top">
+        <Text class="sapUiResponsiveMargin" id="popoverErrorMessage" text="No error message available" />
+    </Popover>
+</core:FragmentDefinition>
