@@ -111,7 +111,8 @@
                             width="20%" 
                             id="myMultiComboBoxs" 
                             selectedKeys="ERRONEOUS,RUNNING,SUSPENDED,COMPLETED,CANCELED" 
-                            selectionChange=".onSelectionChange">
+                            selectionChange=".onSelectionChange"
+                            showSelectAll="true">
                             <core:Item key="CANCELED" text="Canceled"/>   
                             <core:Item key="COMPLETED" text="Completed"/>
                             <core:Item key="ERRONEOUS" text="Erroneous"/>    
@@ -143,7 +144,7 @@
                 <ScrollContainer horizontal="false" vertical="true" height="100%">
                     <IconTabBar>
                         <items>
-                            <IconTabFilter text="Overview" key="overview" icon="sap-icon://overview-chart">
+                            <IconTabFilter text="Process Overview" key="overview" icon="sap-icon://overview-chart">
                                 <VBox width="100%" justifyContent="SpaceAround">
                                     <!-- Overview Counts -->
                                     <HBox justifyContent="SpaceAround" width="100%">
@@ -173,10 +174,9 @@
                                         </VBox>
                                     </HBox>
                                     
-                                    <VBox height="20px"/> <!-- Add height to create space -->
-                                    <HBox justifyContent="SpaceAround" width="100%">
+                                    
                                         <!-- Line Chart -->
-                                        <VBox width="45%">
+                                        <!-- <VBox width="45%">
                                             <viz:VizFrame id="idLineChart" vizType="line" height="400px" width="100%" >
                                                 <viz:dataset>
                                                     <viz.data:FlattenedDataset data="{lineModel>/LineData}">
@@ -195,32 +195,81 @@
                                                
                                             </viz:VizFrame>
                                              <viz:Popover id="lineChartPopover" />
-                                        </VBox>
+                                        </VBox> -->
 
-                                        <!-- Pie Chart -->
-                                        <VBox width="45%">
-                                            <viz:VizFrame id="idVizFramePie" height="400px" width="100%" selectData="onPieSelect" uiConfig="{applicationSet:'fiori'}" visible="true" vizType="pie">
-                                                <viz:dataset>
-                                                    <viz.data:FlattenedDataset data="{pieModel>/PieData}">
-                                                        <viz.data:dimensions>
-                                                            <viz.data:DimensionDefinition name="Process Name" value="{pieModel>Status}"/>
-                                                        </viz.data:dimensions>
-                                                        <viz.data:measures>
-                                                            <viz.data:MeasureDefinition name="Error Count" value="{pieModel>Count}"/>
-                                                        </viz.data:measures>
-                                                    </viz.data:FlattenedDataset>
-                                                </viz:dataset>
-                                                <viz:feeds>
-                                                    <viz.feeds:FeedItem uid="size" type="Measure" values="Error Count"/>
-                                                    <viz.feeds:FeedItem uid="color" type="Dimension" values="Process Name"/>
-                                                </viz:feeds>
-                                                <!-- <viz:dependents>
-                                                    <viz:Popover id="idPopOver"/>
-                                                </viz:dependents> -->
-                                            </viz:VizFrame>
-                                        </VBox>
-                                    </HBox>
-                                </VBox>
+
+    <!-- Add height to create space -->
+    <VBox height="20px"/>
+
+    <HBox justifyContent="SpaceAround" width="100%">
+        <!-- Flip Container -->
+       <VBox id="flipContainer" class="flip-container" width="45%">
+    <VBox class="flipper">
+        <!-- Front Side (Line Chart) -->
+        <VBox id="lineChartContainer" class="flip-front" visible="true" width="100%">
+            <viz:VizFrame id="idLineChart" vizType="line" height="400px" width="100%" selectData="onSelectLineChart">
+                    <viz:dataset>
+                        <viz.data:FlattenedDataset data="{lineModel>/LineData}">
+                            <viz.data:dimensions>
+                                <viz.data:DimensionDefinition name="Timestamp" value="{lineModel>Timestamp}"/>
+                            </viz.data:dimensions>
+                            <viz.data:measures>
+                                <viz.data:MeasureDefinition name="Process Count" value="{lineModel>ProcessCount}"/>
+                            </viz.data:measures>
+                        </viz.data:FlattenedDataset>
+                    </viz:dataset>
+                    <viz:feeds>
+                        <viz.feeds:FeedItem uid="categoryAxis" type="Dimension" values="Timestamp"/>
+                        <viz.feeds:FeedItem uid="valueAxis" type="Measure" values="Process Count"/>
+                    </viz:feeds>
+                </viz:VizFrame>
+            </VBox>
+
+            <!-- Bar Chart -->
+            <VBox id="barChartContainer" class="flip-back" visible="false" width="100%">
+            <Button text="Back to Line Chart" press="onBackToLineChart" />
+                <viz:VizFrame id="idBarChart"  height="400px" width="100%">
+                    <viz:dataset>
+                        <viz.data:FlattenedDataset data="{barModel>/BarData}">
+                            <viz.data:dimensions>
+                                <viz.data:DimensionDefinition name="Category" value="{barModel>Category}"/>
+                            </viz.data:dimensions>
+                            <viz.data:measures>
+                                <viz.data:MeasureDefinition name="Value" value="{barModel>Value}"/>
+                            </viz.data:measures>
+                        </viz.data:FlattenedDataset>
+                    </viz:dataset>
+                    <viz:feeds>
+                        <viz.feeds:FeedItem uid="categoryAxis" type="Dimension" values="Category"/>
+                        <viz.feeds:FeedItem uid="valueAxis" type="Measure" values="Value"/>
+                    </viz:feeds>
+                </viz:VizFrame>
+            </VBox>
+        </VBox>
+        </VBox>
+
+        <!-- Pie Chart -->
+        <VBox width="45%">
+            <viz:VizFrame id="idVizFramePie" height="400px" width="100%" selectData="onPieSelect" uiConfig="{applicationSet:'fiori'}" visible="true" vizType="pie">
+                <viz:dataset>
+                    <viz.data:FlattenedDataset data="{pieModel>/PieData}">
+                        <viz.data:dimensions>
+                            <viz.data:DimensionDefinition name="Process Name" value="{pieModel>Status}"/>
+                        </viz.data:dimensions>
+                        <viz.data:measures>
+                            <viz.data:MeasureDefinition name="Error Count" value="{pieModel>Count}"/>
+                        </viz.data:measures>
+                    </viz.data:FlattenedDataset>
+                </viz:dataset>
+                <viz:feeds>
+                    <viz.feeds:FeedItem uid="size" type="Measure" values="Error Count"/>
+                    <viz.feeds:FeedItem uid="color" type="Dimension" values="Process Name"/>
+                </viz:feeds>
+            </viz:VizFrame>
+        </VBox>
+    </HBox>
+</VBox>
+
                             </IconTabFilter>
 
                             <IconTabFilter text="Error Monitor" key="signals" icon="sap-icon://activity-items">

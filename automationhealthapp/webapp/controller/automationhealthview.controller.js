@@ -14,6 +14,9 @@ sap.ui.define([
     return Controller.extend("automationhealthapp.controller.automationhealthview", {
         onInit: function () {
 
+            var oBarModel = new sap.ui.model.json.JSONModel();
+            this.getView().setModel(oBarModel, "barModel");
+
 
             var automationDetailsModel = new sap.ui.model.json.JSONModel({
                 instances: [],
@@ -934,19 +937,17 @@ sap.ui.define([
                         text: oData.display_Name
                     }));
                     
-                    // Store the ID in the array
+             
                     aIds.push(oData.ID);
                 });
         
-                // Add tokens to the MultiInput
                 aSelectedTokens.forEach(function (oToken) {
                     oMultiInput.addToken(oToken);
                 });
         
-                // Convert the IDs array to a comma-separated string
+                
                 var sIdsCommaSeparated = aIds.join(",");
         
-                // Log or store the comma-separated IDs as needed
                 console.log("Comma-separated IDs:", sIdsCommaSeparated);
                 
                 // Optional: Store this string in a model or variable as per your requirement
@@ -1434,6 +1435,201 @@ sap.ui.define([
                             });
                         }
                     },
+
+
+
+                    // onSelectLineChart: function (oEvent) {
+                        // var oFlipContainer = this.byId("flipContainer");
+                        // var oLineChartContainer = this.byId("lineChartContainer");
+                        // var oBarChartContainer = this.byId("barChartContainer");
+                    
+                        // // Toggle visibility
+                        // if (oLineChartContainer.getVisible()) {
+                        //     oLineChartContainer.setVisible(false);
+                        //     oBarChartContainer.setVisible(true);
+                        //     oFlipContainer.addStyleClass("flip-active"); // Add flip-active class for animation
+                        // } else {
+                        //     oLineChartContainer.setVisible(true);
+                        //     oBarChartContainer.setVisible(false);
+                        //     oFlipContainer.removeStyleClass("flip-active"); // Remove flip-active class
+                    //     }
+                    // },
+
+
+
+
+    //                 onSelectLineChart: function (oEvent) {
+    //                     var oSelectedData = oEvent.getParameter("data"); // Get the selected data points
+                    
+    //                     if (oSelectedData && oSelectedData.length > 0) {
+    //                         // Access the first selected data point
+    //                         var selectedReading = oSelectedData[0].data.Timestamp; // Replace 'Timestamp' with the actual dimension name in your dataset
+                            
+    //                         // Flip the chart
+    //                         this._flipCharts();
+                    
+    //                         // Update the bar chart data based on the selected reading
+    //                         this._updateBarChartData(selectedReading);
+    //                     } else {
+    //                         console.warn("No data point selected");
+    //                     }
+    //                 },
+                    
+    //                 // Function to apply the flip animation
+    //                 _flipCharts: function () {
+    //                     // // var oFlipContainer = this.byId("flipContainer");
+    //                     // // oFlipContainer.addStyleClass("flipped");
+
+    //                     // var oFlipContainer = this.byId("flipContainer");
+    //                     // var oLineChartContainer = this.byId("lineChartContainer");
+    //                     // var oBarChartContainer = this.byId("barChartContainer");
+                    
+    //                     // // Toggle visibility
+    //                     // if (oLineChartContainer.getVisible()) {
+    //                     //     oLineChartContainer.setVisible(false);
+    //                     //     oBarChartContainer.setVisible(true);
+    //                     //     oFlipContainer.addStyleClass("flip-active"); // Add flip-active class for animation
+    //                     // } else {
+    //                     //     oLineChartContainer.setVisible(true);
+    //                     //     oBarChartContainer.setVisible(false);
+    //                     //     oFlipContainer.removeStyleClass("flip-active");
+    //                     // }
+
+    //                     var oFlipContainer = this.byId("flipContainer");
+    // var oLineChartContainer = this.byId("lineChartContainer");
+    // var oBarChartContainer = this.byId("barChartContainer");
+
+    // if (oFlipContainer.hasStyleClass("flipped")) {
+    //     // Flip back to front
+    //     oFlipContainer.removeStyleClass("flipped");
+    //     oLineChartContainer.setVisible(true);
+    //     oBarChartContainer.setVisible(false);
+    // } else {
+    //     // Flip to back
+    //     oFlipContainer.addStyleClass("flipped");
+    //     oLineChartContainer.setVisible(false);
+    //     oBarChartContainer.setVisible(true);
+    // }
+    //                 },
+                    
+    //                 // Function to update the bar chart data based on the selected reading
+                    // _updateBarChartData: function (selectedReading) {
+                    //     // Get the barModel
+                    //     var oBarModel = this.getView().getModel("barModel");
+                    
+                    //     // Check if the model exists
+                    //     if (!oBarModel) {
+                    //         console.error("barModel is not defined or not set on the view.");
+                    //         return;
+                    //     }
+                    
+                    //     // Sample data update logic
+                    //     var oData = {
+                    //         BarData: [
+                    //             { Category: "Category 1", Value: 20 },
+                    //             { Category: "Category 2", Value: 40 },
+                    //             { Category: "Category 3", Value: 60 }
+                    //         ]
+                    //     };
+                    
+                    //     // Update the model with new data
+                    //     oBarModel.setData(oData);
+                    // },
+
+
+    onSelectLineChart: function (oEvent) {
+        var oSelectedData = oEvent.getParameter("data"); // Get the selected data points
+    
+        if (oSelectedData && oSelectedData.length > 0) {
+            // Access the first selected data point
+            var selectedReading = oSelectedData[0].data.Timestamp;
+    
+            // Trigger the flip animation
+            this._flipToBarChart(selectedReading);
+            this._updateBarChartData(selectedReading);
+        } else {
+            console.warn("No data point selected");
+        }
+    },
+    
+    _flipToBarChart: function (selectedReading) {
+        var oFlipContainer = this.byId("flipContainer");
+        // var oLineChartContainer = this.byId("lineChartContainer");
+        var oBarChartContainer = this.byId("barChartContainer");
+    
+        // Add the 'flipped' class for animation
+        oFlipContainer.addStyleClass("flipped");
+    
+        // Delay setting the visibility to avoid interrupting the animation
+        setTimeout(function () {
+            // oLineChartContainer.setVisible(false);
+            oBarChartContainer.setVisible(true);
+        }, 400); // Match the CSS transition duration
+    },
+    
+
+    _updateBarChartData: function (selectedReading) {
+        // Get the barModel
+        var oBarModel = this.getView().getModel("barModel");
+    
+        // Check if the model exists
+        if (!oBarModel) {
+            console.error("barModel is not defined or not set on the view.");
+            return;
+        }
+    
+        // Sample data update logic
+        var oData = {
+            BarData: [
+                { Category: "Category 1", Value: 20 },
+                { Category: "Category 2", Value: 40 },
+                { Category: "Category 3", Value: 60 }
+            ]
+        };
+    
+        // Update the model with new data
+        oBarModel.setData(oData);
+    },
+
+                      
+
+
+                    // onBackToLineChart: function () {
+                    //     // Get references to the containers
+                    //     var oFlipContainer = this.byId("flipContainer");
+                    //     var oLineChartContainer = this.byId("lineChartContainer");
+                    //     var oBarChartContainer = this.byId("barChartContainer");
+                    
+                    //     // Flip back to the line chart
+                    //     if (oFlipContainer.hasStyleClass("flipped")) {
+                    //         oFlipContainer.removeStyleClass("flipped");
+                    //         oLineChartContainer.setVisible(true);
+                    //         oBarChartContainer.setVisible(false);
+                    //     }
+                    // }
+
+
+
+
+                    onBackToLineChart: function () {
+                        var oFlipContainer = this.byId("flipContainer");
+                        var oLineChartContainer = this.byId("lineChartContainer");
+                        var oBarChartContainer = this.byId("barChartContainer");
+                    
+                        // Remove the 'flipped' class for animation
+                        oFlipContainer.removeStyleClass("flipped");
+                    
+                        // Delay visibility changes for seamless animation
+                        setTimeout(function () {
+                            oBarChartContainer.setVisible(false);
+                            oLineChartContainer.setVisible(true);
+                        }, 600); // Match the CSS transition duration
+                    },
+                    
+                    
+                    
+                    
+                    
 
                 });
             
