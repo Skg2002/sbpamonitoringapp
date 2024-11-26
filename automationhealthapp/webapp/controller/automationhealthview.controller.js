@@ -2035,30 +2035,30 @@ sap.ui.define([
                     // }
 
 
-                    onSelectBarChart: function (oEvent) {
-                        var oSelectedData = oEvent.getParameter("data");
+                    // onSelectBarChart: function (oEvent) {
+                    //     var oSelectedData = oEvent.getParameter("data");
                     
-                        if (oSelectedData && oSelectedData.length > 0) {
-                            var oVizFrame = this.getView().byId("idBarChart");
-                            var tenantIds = oVizFrame.data("tenantIds"); 
+                    //     if (oSelectedData && oSelectedData.length > 0) {
+                    //         var oVizFrame = this.getView().byId("idBarChart");
+                    //         var tenantIds = oVizFrame.data("tenantIds"); 
                     
-                            var selectedTenant = oSelectedData[0].data.Tenant;
-                            var selectedIds = tenantIds[selectedTenant];
+                    //         var selectedTenant = oSelectedData[0].data.Tenant;
+                    //         var selectedIds = tenantIds[selectedTenant];
                             
-                            var oRouter = this.getOwnerComponent().getRouter();
-                            oRouter.navTo("selectedprocessdetails", { 
-                                Tenant: selectedTenant,
-                                IDs: selectedIds
-                            });
+                    //         var oRouter = this.getOwnerComponent().getRouter();
+                    //         oRouter.navTo("selectedprocessdetails", { 
+                    //             Tenant: selectedTenant,
+                    //             IDs: selectedIds
+                    //         });
                     
-                            // Reset the back button when navigating away from the bar chart
-                            var oBackButton = this.byId("backButton");
-                            if (oBackButton) {
-                                oBackButton.setVisible(true);  // Ensure it's visible
-                                oBackButton.setEnabled(true);  // Ensure it's enabled
-                            }
-                        }
-                    },
+                    //         // Reset the back button when navigating away from the bar chart
+                    //         var oBackButton = this.byId("backButton");
+                    //         if (oBackButton) {
+                    //             oBackButton.setVisible(true);  // Ensure it's visible
+                    //             oBackButton.setEnabled(true);  // Ensure it's enabled
+                    //         }
+                    //     }
+                    // },
                     
 
 
