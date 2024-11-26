@@ -107,6 +107,13 @@
           "target": [
             "Targetautomationhealthview"
           ]
+        },
+        {
+          "name": "selectedprocessdetails",
+          "pattern": "Details/{Tenant},{IDs}",
+          "target": [
+            "TargetSelectedProcessDetailsview"
+          ]
         }
       ],
       "targets": {
@@ -116,6 +123,13 @@
           "clearControlAggregation": false,
           "viewId": "automationhealthview",
           "viewName": "automationhealthview"
+        },
+        "TargetSelectedProcessDetailsview": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "selectedprocessdetails",
+          "viewName": "selectedprocessdetails"
         }
       }
     },

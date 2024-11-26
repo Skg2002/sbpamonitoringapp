@@ -142,7 +142,7 @@
 
                 <!-- Scroll Container -->
                 <ScrollContainer horizontal="false" vertical="true" height="100%">
-                    <IconTabBar>
+                    <IconTabBar select=".onIconTabFilterSelect">
                         <items>
                             <IconTabFilter text="Process Overview" key="overview" icon="sap-icon://overview-chart">
                                 <VBox width="100%" justifyContent="SpaceAround">
@@ -201,13 +201,13 @@
     <!-- Add height to create space -->
     <VBox height="20px"/>
 
-    <HBox justifyContent="SpaceAround" width="100%">
-        <!-- Flip Container -->
-       <VBox id="flipContainer" class="flip-container" width="45%">
-    <VBox class="flipper">
-        <!-- Front Side (Line Chart) -->
-        <VBox id="lineChartContainer" class="flip-front" visible="true" width="100%">
-            <viz:VizFrame id="idLineChart" vizType="line" height="400px" width="100%" selectData="onSelectLineChart">
+<HBox justifyContent="SpaceAround" width="100%">
+    <!-- Flip Container for Line Chart and Bar Chart -->
+    <VBox id="flipContainer" class="flip-container" width="45%">
+        <VBox class="flipper">
+            <!-- Front Side (Line Chart) -->
+            <VBox id="lineChartContainer" class="flip-front" visible="true" width="100%">
+                <viz:VizFrame id="idLineChart" vizType="line" height="400px" width="100%" selectData="onSelectLineChart">
                     <viz:dataset>
                         <viz.data:FlattenedDataset data="{lineModel>/LineData}">
                             <viz.data:dimensions>
@@ -225,14 +225,14 @@
                 </viz:VizFrame>
             </VBox>
 
-            <!-- Bar Chart -->
+            <!-- Back Side (Bar Chart) -->
             <VBox id="barChartContainer" class="flip-back" visible="false" width="100%">
-            <Button text="Back to Line Chart" press="onBackToLineChart" />
-                <viz:VizFrame id="idBarChart"  height="400px" width="100%">
+                <Button icon="sap-icon://nav-back" press="onBackToLineChart" id="bck2line" />
+                <viz:VizFrame id="idBarChart" height="400px" width="100%" selectData="onSelectBarChart">
                     <viz:dataset>
                         <viz.data:FlattenedDataset data="{barModel>/BarData}">
                             <viz.data:dimensions>
-                                <viz.data:DimensionDefinition name="Category" value="{barModel>Category}"/>
+                                <viz.data:DimensionDefinition name="Tenant" value="{barModel>Category}"/>
                             </viz.data:dimensions>
                             <viz.data:measures>
                                 <viz.data:MeasureDefinition name="Value" value="{barModel>Value}"/>
@@ -240,34 +240,59 @@
                         </viz.data:FlattenedDataset>
                     </viz:dataset>
                     <viz:feeds>
-                        <viz.feeds:FeedItem uid="categoryAxis" type="Dimension" values="Category"/>
+                        <viz.feeds:FeedItem uid="categoryAxis" type="Dimension" values="Tenant"/>
                         <viz.feeds:FeedItem uid="valueAxis" type="Measure" values="Value"/>
                     </viz:feeds>
                 </viz:VizFrame>
             </VBox>
         </VBox>
-        </VBox>
+    </VBox>
+    
+     <VBox id="flippContainer" class="flip-container" width="45%">
+    <!-- Ensure Pie Chart and other content stays in place when switching tabs -->
+    <VBox class="flipper">
+     <VBox id="pieChartContainer" class="flip-front" visible="true" width="100%">
+        <viz:VizFrame id="idVizFramePie" height="400px" width="100%" selectData="onPieSelect" uiConfig="{applicationSet:'fiori'}" visible="true" vizType="pie" >
+            <viz:dataset>
+                <viz.data:FlattenedDataset data="{pieModel>/PieData}">
+                    <viz.data:dimensions>
+                        <viz.data:DimensionDefinition name="ProcessName" value="{pieModel>Status}"/>
+                    </viz.data:dimensions>
+                    <viz.data:measures>
+                        <viz.data:MeasureDefinition name="Error Count" value="{pieModel>Count}"/>
+                    </viz.data:measures>
+                </viz.data:FlattenedDataset>
+            </viz:dataset>
+            <viz:feeds>
+                <viz.feeds:FeedItem uid="size" type="Measure" values="Error Count"/>
+                <viz.feeds:FeedItem uid="color" type="Dimension" values="ProcessName"/>
+            </viz:feeds>
+        </viz:VizFrame>
+    </VBox>
 
-        <!-- Pie Chart -->
-        <VBox width="45%">
-            <viz:VizFrame id="idVizFramePie" height="400px" width="100%" selectData="onPieSelect" uiConfig="{applicationSet:'fiori'}" visible="true" vizType="pie">
-                <viz:dataset>
-                    <viz.data:FlattenedDataset data="{pieModel>/PieData}">
-                        <viz.data:dimensions>
-                            <viz.data:DimensionDefinition name="Process Name" value="{pieModel>Status}"/>
-                        </viz.data:dimensions>
-                        <viz.data:measures>
-                            <viz.data:MeasureDefinition name="Error Count" value="{pieModel>Count}"/>
-                        </viz.data:measures>
-                    </viz.data:FlattenedDataset>
-                </viz:dataset>
-                <viz:feeds>
-                    <viz.feeds:FeedItem uid="size" type="Measure" values="Error Count"/>
-                    <viz.feeds:FeedItem uid="color" type="Dimension" values="Process Name"/>
-                </viz:feeds>
-            </viz:VizFrame>
+     <VBox id="donutChartContainer" class="flip-back" visible="false" width="100%" >
+                <Button icon="sap-icon://nav-back" press="onBackToPieChart" />
+                <viz:VizFrame id="idDonutChart" height="400px" width="100%" vizType='donut'>
+                    <viz:dataset>
+                        <viz.data:FlattenedDataset data="{donutModel>/DonutData}">
+                            <viz.data:dimensions>
+                                <viz.data:DimensionDefinition name="Category" value="{donutModel>Category}"/>
+                            </viz.data:dimensions>
+                            <viz.data:measures>
+                                <viz.data:MeasureDefinition name="Value" value="{donutModel>Value}"/>
+                            </viz.data:measures>
+                        </viz.data:FlattenedDataset>
+                    </viz:dataset>
+                    <viz:feeds>
+                        <viz.feeds:FeedItem uid="size" type="Measure" values="Value"/>
+            <viz.feeds:FeedItem uid="color" type="Dimension" values="Category"/>
+                    </viz:feeds>
+                </viz:VizFrame>
         </VBox>
-    </HBox>
+         </VBox>
+          </VBox>
+</HBox>
+
 </VBox>
 
                             </IconTabFilter>

@@ -17,6 +17,10 @@ sap.ui.define([
             var oBarModel = new sap.ui.model.json.JSONModel();
             this.getView().setModel(oBarModel, "barModel");
 
+            var oDonutModel = new sap.ui.model.json.JSONModel();
+            this.getView().setModel(oDonutModel, "donutModel");
+
+
 
             var automationDetailsModel = new sap.ui.model.json.JSONModel({
                 instances: [],
@@ -31,7 +35,11 @@ sap.ui.define([
             this.getView().setModel(oExecutionModel, "executionModel");
 
 
-
+            // var oBackButton = this.byId("bck2line");
+            // if (oBackButton) {
+            //     oBackButton.setVisible(true); // Make sure it's visible when the view is initialized
+            //     oBackButton.setEnabled(true); // Ensure it's enabled
+            // }
 
 
             
@@ -40,6 +48,8 @@ sap.ui.define([
             var oVizAutomation =this.getView().byId("maxResponseTimeChart");
             var ovizErrorLine=this.getView().byId("lineChart");
             var ovizErrorCode=this.getView().byId("idVizFrames");
+            var oVizBarFrame = this.getView().byId("idBarChart");
+            var oVizDonutFrame = this.getView().byId("idDonutChart");
             var oPopover = this.byId("lineChartPopover");
 
             // Set VizFrame properties, including title
@@ -95,14 +105,28 @@ sap.ui.define([
                 }
             });
 
+            oVizBarFrame.setVizProperties({
+                title: {
+                    visible: true,
+                    text: "Tenant-wise Process Visualization"
+                }
+            });
+            oVizDonutFrame.setVizProperties({
+                title: {
+                    visible: true,
+                    text: "Tenant-wise Process Visualization"
+                }
+            });
+
+
             // this._popover = new Popover({
             //     placement: "Bottom",
             //     content: new Text({ text: "" })
             // });
 
-            oVizLineFrame.attachRenderComplete(function () {
-                oPopover.connect(oVizLineFrame.getVizUid());
-            });
+            // oVizLineFrame.attachRenderComplete(function () {
+            //     oPopover.connect(oVizLineFrame.getVizUid());
+            // });
             this.fetchedData = [];
             this._selectedStatuses = [];
             let oDateRangeSelection = this.byId("dateTimePicker");
@@ -130,6 +154,27 @@ sap.ui.define([
             // this.loadData();
 
         },
+
+
+        // onIconTabFilterSelect: function (oEvent) {
+        //     const sSelectedKey = oEvent.getParameter("key");
+        
+        //     if (sSelectedKey === "overview") {
+        //         // Assuming `pieChartId` is the ID of your Pie Chart control
+        //         const oPieChart = this.byId("idVizFramePie");
+                
+        //         if (oPieChart) {
+        //             // Refresh the Pie Chart's binding
+        //             const oModel = oPieChart.getModel(); // Replace with actual model if needed
+        //             const sBindingPath = oPieChart.getBindingPath("dataset"); // Adjust as per your binding
+        //             oPieChart.bindElement(sBindingPath);
+        //             oPieChart.invalidate(); // Force re-rendering
+        //         }
+        //     }
+        // },
+        
+      
+        
 
 
         // _loadDestination: function() {
@@ -430,6 +475,18 @@ sap.ui.define([
             // var oDateRangeSelector = that.getView().byId("dateTimePicker");
             // var dateRange = oDateRangeSelector.getDateValue() && oDateRangeSelector.getSecondDateValue();
 
+            let oBarChartContainer = this.byId("barChartContainer");
+            if (oBarChartContainer.getVisible()) {
+                // Call the function to switch back to the Pie Chart
+                this.onBackToLineChart();
+            }
+            // Check if the Donut Chart is visible
+            let oDonutChartContainer = this.byId("donutChartContainer");
+            if (oDonutChartContainer.getVisible()) {
+                // Call the function to switch back to the Pie Chart
+                this.onBackToPieChart();
+            }
+
                 this._filterDataByDateRange(startDate, endDate);
 
             this.filterData(startDate, endDate, this._selectedStatuses);
@@ -456,62 +513,234 @@ sap.ui.define([
             this.processFilteredData(filteredData, startDate, endDate);
         },
 
+        
+
+
+
+        // processFilteredData: function (filteredData, startDate, endDate) {
+        //     let instanceDetailsArray = [];
+        //     let processData = {};
+        //     let tenantData = {};  // Store tenant counts grouped by Timestamp
+        //     let tenantDataByStatus = {}; // Store tenant counts grouped by Status for Pie/Donut charts
+        
+        //     // Determine whether to group by hour, day, or month
+        //     const sameDay = startDate.toDateString() === endDate.toDateString();
+        
+        //     if (sameDay) {
+        //         filteredData.forEach(instance => {
+        //             let hourKey = new Date(instance.startedAt).getHours();
+        //             let formattedTime = this.formatTime(instance.startedAt); // Format time for display
+        
+        //             // Count the process occurrences
+        //             processData[formattedTime] = (processData[formattedTime] || 0) + 1;
+        
+        //             // Count the tenants per timestamp
+        //             if (!tenantData[formattedTime]) {
+        //                 tenantData[formattedTime] = {};
+        //             }
+        //             tenantData[formattedTime][instance.tenant] = (tenantData[formattedTime][instance.tenant] || 0) + 1;
+        
+        //             // Count tenants per status (for Pie/Donut chart)
+        //             if (!tenantDataByStatus[instance.status]) {
+        //                 tenantDataByStatus[instance.status] = {};
+        //             }
+        //             tenantDataByStatus[instance.status][instance.tenant] = (tenantDataByStatus[instance.status][instance.tenant] || 0) + 1;
+        
+        //             instanceDetailsArray.push({
+        //                 SubjectName: instance.subject,
+        //                 StartedAt: instance.startedAt,
+        //                 Status: instance.status,
+        //             });
+        //         });
+        //     } else if ((endDate - startDate) / (1000 * 60 * 60 * 24) <= 31) {
+        //         filteredData.forEach(instance => {
+        //             let dateKey = instance.startedAt.substring(0, 10); // Format: YYYY-MM-DD
+        
+        //             // Count the process occurrences
+        //             processData[dateKey] = (processData[dateKey] || 0) + 1;
+        
+        //             // Count the tenants per date
+        //             if (!tenantData[dateKey]) {
+        //                 tenantData[dateKey] = {};
+        //             }
+        //             tenantData[dateKey][instance.tenant] = (tenantData[dateKey][instance.tenant] || 0) + 1;
+        
+        //             // Count tenants per status (for Pie/Donut chart)
+        //             if (!tenantDataByStatus[instance.status]) {
+        //                 tenantDataByStatus[instance.status] = {};
+        //             }
+        //             tenantDataByStatus[instance.status][instance.tenant] = (tenantDataByStatus[instance.status][instance.tenant] || 0) + 1;
+        
+        //             instanceDetailsArray.push({
+        //                 SubjectName: instance.subject,
+        //                 StartedAt: instance.startedAt,
+        //                 Status: instance.status,
+        //             });
+        //         });
+        //     } else {
+        //         filteredData.forEach(instance => {
+        //             let monthKey = new Date(instance.startedAt).toLocaleString('default', { month: 'long', year: 'numeric' });
+        
+        //             // Count the process occurrences
+        //             processData[monthKey] = (processData[monthKey] || 0) + 1;
+        
+        //             // Count the tenants per month
+        //             if (!tenantData[monthKey]) {
+        //                 tenantData[monthKey] = {};
+        //             }
+        //             tenantData[monthKey][instance.tenant] = (tenantData[monthKey][instance.tenant] || 0) + 1;
+        
+        //             // Count tenants per status (for Pie/Donut chart)
+        //             if (!tenantDataByStatus[instance.status]) {
+        //                 tenantDataByStatus[instance.status] = {};
+        //             }
+        //             tenantDataByStatus[instance.status][instance.tenant] = (tenantDataByStatus[instance.status][instance.tenant] || 0) + 1;
+        
+        //             instanceDetailsArray.push({
+        //                 SubjectName: instance.subject,
+        //                 StartedAt: instance.startedAt,
+        //                 Status: instance.status,
+        //             });
+        //         });
+        //     }
+        
+        //     const totalLogs = filteredData.length;
+        //     let oInstanceDetailsModel = new JSONModel({ InstanceDetails: instanceDetailsArray });
+        //     this.getView().setModel(oInstanceDetailsModel, "instanceDetailsModel");
+        
+        //     let chartData = Object.keys(processData).map(key => ({
+        //         Timestamp: sameDay && typeof key === "number" ? key + ":00" : key, // Add ":00" for hours
+        //         ProcessCount: processData[key]
+        //     }));
+        
+        //     let statusCounts = filteredData.reduce((acc, instance) => {
+        //         acc[instance.status] = (acc[instance.status] || 0) + 1;
+        //         return acc;
+        //     }, {});
+        
+        //     let pieData = Object.keys(statusCounts).map(status => ({
+        //         Status: status,
+        //         Count: statusCounts[status]
+        //     }));
+        
+        //     // Now that we have both processData and tenantData, let's store it in models
+        //     this._updateModels(chartData, pieData, totalLogs, startDate, endDate, tenantData, tenantDataByStatus);
+        // },
+
         processFilteredData: function (filteredData, startDate, endDate) {
             let instanceDetailsArray = [];
             let processData = {};
+            let tenantData = {}; // Store tenant counts and their respective IDs grouped by Timestamp
+            let tenantDataByStatus = {}; // Store tenant counts grouped by Status for Pie/Donut charts
         
             // Determine whether to group by hour, day, or month
             const sameDay = startDate.toDateString() === endDate.toDateString();
         
-            if (sameDay) {
-                // Group by hour if the date range is the same day
-                filteredData.forEach(instance => {
+            filteredData.forEach(instance => {
+                if (sameDay) {
                     let hourKey = new Date(instance.startedAt).getHours();
                     let formattedTime = this.formatTime(instance.startedAt); // Format time for display
-                    
+        
+                    // Count the process occurrences
                     processData[formattedTime] = (processData[formattedTime] || 0) + 1;
+        
+                    // Count the tenants per timestamp
+                    if (!tenantData[formattedTime]) {
+                        tenantData[formattedTime] = {};
+                    }
+                    if (!tenantData[formattedTime][instance.tenant]) {
+                        tenantData[formattedTime][instance.tenant] = {
+                            count: 0,
+                            ids: []
+                        };
+                    }
+                    tenantData[formattedTime][instance.tenant].count += 1;
+                    tenantData[formattedTime][instance.tenant].ids.push(instance.id); // Collect the IDs
+        
+                    // Count tenants per status (for Pie/Donut chart)
+                    if (!tenantDataByStatus[instance.status]) {
+                        tenantDataByStatus[instance.status] = {};
+                    }
+                    tenantDataByStatus[instance.status][instance.tenant] = (tenantDataByStatus[instance.status][instance.tenant] || 0) + 1;
+        
                     instanceDetailsArray.push({
                         SubjectName: instance.subject,
                         StartedAt: instance.startedAt,
                         Status: instance.status,
                     });
-                });
-            } else if ((endDate - startDate) / (1000 * 60 * 60 * 24) <= 31) {
-                // Group by day if the range is within a month
-                filteredData.forEach(instance => {
+                } else if ((endDate - startDate) / (1000 * 60 * 60 * 24) <= 31) {
                     let dateKey = instance.startedAt.substring(0, 10); // Format: YYYY-MM-DD
+        
+                    // Count the process occurrences
                     processData[dateKey] = (processData[dateKey] || 0) + 1;
+        
+                    // Count the tenants per date
+                    if (!tenantData[dateKey]) {
+                        tenantData[dateKey] = {};
+                    }
+                    if (!tenantData[dateKey][instance.tenant]) {
+                        tenantData[dateKey][instance.tenant] = {
+                            count: 0,
+                            ids: []
+                        };
+                    }
+                    tenantData[dateKey][instance.tenant].count += 1;
+                    tenantData[dateKey][instance.tenant].ids.push(instance.id); // Collect the IDs
+        
+                    // Count tenants per status (for Pie/Donut chart)
+                    if (!tenantDataByStatus[instance.status]) {
+                        tenantDataByStatus[instance.status] = {};
+                    }
+                    tenantDataByStatus[instance.status][instance.tenant] = (tenantDataByStatus[instance.status][instance.tenant] || 0) + 1;
+        
                     instanceDetailsArray.push({
                         SubjectName: instance.subject,
                         StartedAt: instance.startedAt,
                         Status: instance.status,
                     });
-                });
-            } else {
-                // Group by month for longer ranges
-                filteredData.forEach(instance => {
+                } else {
                     let monthKey = new Date(instance.startedAt).toLocaleString('default', { month: 'long', year: 'numeric' });
+        
+                    // Count the process occurrences
                     processData[monthKey] = (processData[monthKey] || 0) + 1;
+        
+                    // Count the tenants per month
+                    if (!tenantData[monthKey]) {
+                        tenantData[monthKey] = {};
+                    }
+                    if (!tenantData[monthKey][instance.tenant]) {
+                        tenantData[monthKey][instance.tenant] = {
+                            count: 0,
+                            ids: []
+                        };
+                    }
+                    tenantData[monthKey][instance.tenant].count += 1;
+                    tenantData[monthKey][instance.tenant].ids.push(instance.id); // Collect the IDs
+        
+                    // Count tenants per status (for Pie/Donut chart)
+                    if (!tenantDataByStatus[instance.status]) {
+                        tenantDataByStatus[instance.status] = {};
+                    }
+                    tenantDataByStatus[instance.status][instance.tenant] = (tenantDataByStatus[instance.status][instance.tenant] || 0) + 1;
+        
                     instanceDetailsArray.push({
                         SubjectName: instance.subject,
                         StartedAt: instance.startedAt,
                         Status: instance.status,
                     });
+                }
+            });
+        
+            // Convert IDs array to string joined by '%2C'
+            Object.keys(tenantData).forEach(timestamp => {
+                Object.keys(tenantData[timestamp]).forEach(tenant => {
+                    tenantData[timestamp][tenant].ids = tenantData[timestamp][tenant].ids.join('%2C');
                 });
-            }
+            });
         
             const totalLogs = filteredData.length;
             let oInstanceDetailsModel = new JSONModel({ InstanceDetails: instanceDetailsArray });
             this.getView().setModel(oInstanceDetailsModel, "instanceDetailsModel");
-
-
-
-            
-            
-
-
-
-
         
             let chartData = Object.keys(processData).map(key => ({
                 Timestamp: sameDay && typeof key === "number" ? key + ":00" : key, // Add ":00" for hours
@@ -528,137 +757,49 @@ sap.ui.define([
                 Count: statusCounts[status]
             }));
         
-            this._updateModels(chartData, pieData, totalLogs,startDate,endDate);
+            // Update models with the processed data
+            this._updateModels(chartData, pieData, totalLogs, startDate, endDate, tenantData, tenantDataByStatus);
         },
-
-        // processFilteredData: function (filteredData, startDate, endDate) {
-        //     let instanceDetailsArray = [];
-        //     let processData = {};
-
-        //     // Determine whether to group by hour, day, or month
-        //     const sameDay = startDate.toDateString() === endDate.toDateString();
-
-        //     if (sameDay) {
-        //         // Group by hour if the date range is the same day
-        //         filteredData.forEach(instance => {
-        //             let hourKey = new Date(instance.startedAt).getHours();
-        //             let formattedTime = this.formatTime(instance.startedAt); // Format time for display
-
-        //             processData[formattedTime] = (processData[formattedTime] || 0) + 1;
-        //             instanceDetailsArray.push({
-        //                 SubjectName: instance.subject,
-        //                 StartedAt: instance.startedAt,
-        //                 Status: instance.status,
-        //             });
-        //         });
-        //     } else if ((endDate - startDate) / (1000 * 60 * 60 * 24) <= 31) {
-        //         // Group by day if the range is within a month
-        //         filteredData.forEach(instance => {
-        //             let dateKey = instance.startedAt.substring(0, 10); // Format: YYYY-MM-DD
-        //             processData[dateKey] = (processData[dateKey] || 0) + 1;
-        //             instanceDetailsArray.push({
-        //                 SubjectName: instance.subject,
-        //                 StartedAt: instance.startedAt,
-        //                 Status: instance.status,
-        //             });
-        //         });
-        //     } else {
-        //         // Group by month for longer ranges
-        //         filteredData.forEach(instance => {
-        //             let monthKey = new Date(instance.startedAt).toLocaleString('default', { month: 'long', year: 'numeric' });
-        //             processData[monthKey] = (processData[monthKey] || 0) + 1;
-        //             instanceDetailsArray.push({
-        //                 SubjectName: instance.subject,
-        //                 StartedAt: instance.startedAt,
-        //                 Status: instance.status,
-        //             });
-        //         });
-        //     }
-
-        //     const totalLogs = filteredData.length;
-        //     let oInstanceDetailsModel = new JSONModel({ InstanceDetails: instanceDetailsArray });
-        //     this.getView().setModel(oInstanceDetailsModel, "instanceDetailsModel");
-
-        //     // Now calculate min, max and step for the Y-axis
-        //     let values = Object.values(processData); // Extract all ProcessCount values
-        //     let minValue = Math.floor(Math.min(...values)); // Get the min value and round down
-        //     let maxValue = Math.ceil(Math.max(...values)); // Get the max value and round up
-        //     let step = 1; // Default step value
-
-        //     // Apply ChartFormatter logic to format the Y-axis labels
-        //     this._applyChartFormatter(minValue, maxValue);
-
-        //     // Process the data for charts
-        //     let chartData = Object.keys(processData).map(key => ({
-        //         Timestamp: sameDay && typeof key === "number" ? key + ":00" : key, // Add ":00" for hours
-        //         ProcessCount: processData[key]
-        //     }));
-
-        //     // Pie chart data
-        //     let statusCounts = filteredData.reduce((acc, instance) => {
-        //         acc[instance.status] = (acc[instance.status] || 0) + 1;
-        //         return acc;
-        //     }, {});
-
-        //     let pieData = Object.keys(statusCounts).map(status => ({
-        //         Status: status,
-        //         Count: statusCounts[status]
-        //     }));
-
-        //     // Update the models for the chart and pie data
-        //     this._updateModels(chartData, pieData, totalLogs, minValue, maxValue, step);
-        // },
-
-        // _applyChartFormatter: function (minValue, maxValue) {
-        //     let oVizFrame = this.getView().byId("idLineChart");
-
-        //     // Apply ChartFormatter to format axis labels
-        //     let oChartFormatter = ChartFormatter.getInstance();
-
-        //     // If the max value is small (1, 2, 3), show only discrete values like 0 and 1 (or 0, 2, etc.)
-        //     if (maxValue <= 3) {
-        //         oVizFrame.setVizProperties({
-        //             valueAxis: {
-        //                 scale: {
-        //                     type: "linear",
-        //                     minValue: 0, // Always start from 0
-        //                     maxValue: 3, // We define max value based on our condition
-        //                     step: 1, // Step value should be 1 (no decimals)
-        //                     nice: true // Automatically adjusts the range to be more discrete
-        //                 },
-        //                 label: {
-        //                     formatString: "0" // No decimals, just integer (e.g., 1, 2, 3)
-        //                 }
-        //             }
-        //         });
-        //     } else {
-        //         // If maxValue is larger, use the default settings
-        //         oVizFrame.setVizProperties({
-        //             valueAxis: {
-        //                 label: {
-        //                     formatString: "1.0" // One decimal place if needed
-        //                 }
-        //             }
-        //         });
-        //     }
-        // },
-
-
         
         
+        
+        
+ 
 
-        // _updateModels: function (lineData, pieData, totalLogs,startDate,endDate) {
+
+
+        // _updateModels: function (lineData, pieData, totalLogs, startDate, endDate) {
         //     let oLineModel = new JSONModel({
         //         LineData: lineData,
         //         TotalLogs: totalLogs
         //     });
         //     this.getView().setModel(oLineModel, "lineModel");
-
+        
+        //     // Calculate the maximum ProcessCount in lineData
+        //     let maxProcessCount = Math.max(...lineData.map(item => item.ProcessCount || 0));
+        
+        //     // Conditionally set or reset y-axis range
+        //     let oVizFrame = this.getView().byId("idLineChart");
+        //     if (maxProcessCount <= 2) {
+        //         // Call updateYAxisRange with a fixed range for low ProcessCount values
+        //         this.updateYAxisRange(oVizFrame, 0, 4);
+        //     } else {
+        //         // Reset the primaryScale to enable automatic scaling
+        //         oVizFrame.setVizProperties({
+        //             "plotArea": {
+        //                 "primaryScale": {
+        //                     "fixedRange": false
+        //                 }
+        //             }
+        //         });
+        //     }
+        
+        //     // Update the pie chart model
         //     let statusCounts = pieData.reduce((acc, entry) => {
         //         acc[entry.Status] = entry.Count;
         //         return acc;
         //     }, {});
-
+        
         //     let oPieModel = new JSONModel({
         //         PieData: pieData,
         //         ErroneousCount: statusCounts["ERRONEOUS"] || 0,
@@ -668,30 +809,24 @@ sap.ui.define([
         //         SuspendedCount: statusCounts["SUSPENDED"] || 0
         //     });
         //     this.getView().setModel(oPieModel, "pieModel");
-
+        
         //     this.getOwnerComponent().closeBusyDialog();
-           
         // },
 
 
 
-        _updateModels: function (lineData, pieData, totalLogs, startDate, endDate) {
+        _updateModels: function (lineData, pieData, totalLogs, startDate, endDate, tenantData, tenantDataByStatus) {
             let oLineModel = new JSONModel({
                 LineData: lineData,
                 TotalLogs: totalLogs
             });
             this.getView().setModel(oLineModel, "lineModel");
         
-            // Calculate the maximum ProcessCount in lineData
             let maxProcessCount = Math.max(...lineData.map(item => item.ProcessCount || 0));
-        
-            // Conditionally set or reset y-axis range
             let oVizFrame = this.getView().byId("idLineChart");
             if (maxProcessCount <= 2) {
-                // Call updateYAxisRange with a fixed range for low ProcessCount values
                 this.updateYAxisRange(oVizFrame, 0, 4);
             } else {
-                // Reset the primaryScale to enable automatic scaling
                 oVizFrame.setVizProperties({
                     "plotArea": {
                         "primaryScale": {
@@ -701,7 +836,6 @@ sap.ui.define([
                 });
             }
         
-            // Update the pie chart model
             let statusCounts = pieData.reduce((acc, entry) => {
                 acc[entry.Status] = entry.Count;
                 return acc;
@@ -717,8 +851,15 @@ sap.ui.define([
             });
             this.getView().setModel(oPieModel, "pieModel");
         
+            // Set tenant data for bar chart
+            this._tenantData = tenantData; // Store the tenant data in a member variable
+            this._tenantDataByStatus = tenantDataByStatus; // Store the tenant data by status for donut chart
+        
             this.getOwnerComponent().closeBusyDialog();
         },
+        
+        
+        
         
         updateYAxisRange: function (oVizFrame, min, max) {
             var oVizProperties = {
@@ -738,7 +879,7 @@ sap.ui.define([
         },
         
 
-
+       
 
 
 
@@ -762,11 +903,34 @@ sap.ui.define([
         },
 
         onSelectionChange: function (oEvent) {
+            // this._selectedStatuses = this.byId("myMultiComboBoxs").getSelectedKeys();
+            // let oDateRangeSelection = this.byId("dateTimePicker");
+            // let startDate = oDateRangeSelection.getDateValue();
+            // let endDate = oDateRangeSelection.getSecondDateValue();
+            
+            // this.getOwnerComponent().openBusyDialog();
+            // this.filterData(startDate, endDate, this._selectedStatuses);
+
+
             this._selectedStatuses = this.byId("myMultiComboBoxs").getSelectedKeys();
+
+            // Get the start and end date values
             let oDateRangeSelection = this.byId("dateTimePicker");
             let startDate = oDateRangeSelection.getDateValue();
             let endDate = oDateRangeSelection.getSecondDateValue();
-            
+            let oBarChartContainer = this.byId("barChartContainer");
+            if (oBarChartContainer.getVisible()) {
+                // Call the function to switch back to the Pie Chart
+                this.onBackToLineChart();
+            }
+            // Check if the Donut Chart is visible
+            let oDonutChartContainer = this.byId("donutChartContainer");
+            if (oDonutChartContainer.getVisible()) {
+                // Call the function to switch back to the Pie Chart
+                this.onBackToPieChart();
+            }
+        
+            // Open the busy dialog and filter data
             this.getOwnerComponent().openBusyDialog();
             this.filterData(startDate, endDate, this._selectedStatuses);
             
@@ -897,7 +1061,7 @@ sap.ui.define([
 
             oContext.created().then(function() {
 
-                that._refreshInstanceModel();
+                // that._refreshInstanceModel();
 
                 // var oInstanceModel = that.getView().getModel("instanceModel");
                 // var currentData = oInstanceModel.getData();
@@ -1082,7 +1246,25 @@ sap.ui.define([
         
             this._updateDestination(aIds);
             // Load data based on selected keys
+
+
+           
+        
+
+
             this.getOwnerComponent().openBusyDialog();
+
+            let oBarChartContainer = this.byId("barChartContainer");
+            if (oBarChartContainer.getVisible()) {
+                // Call the function to switch back to the Pie Chart
+                this.onBackToLineChart();
+            }
+            // Check if the Donut Chart is visible
+            let oDonutChartContainer = this.byId("donutChartContainer");
+            if (oDonutChartContainer.getVisible()) {
+                // Call the function to switch back to the Pie Chart
+                this.onBackToPieChart();
+            }
             this.loadData(aSelectedKeys);
         
             // Close the popover
@@ -1401,8 +1583,36 @@ sap.ui.define([
                                 }.bind(this));
                                 this._bEventAttached = true;
                             }.bind(this));
-                        }
+                        }   
+                        
+                        // var oBackButton = this.byId("bck2line");  // Assuming you have the back button with this ID
+                        // if (oBackButton) {
+                        //     // Make sure the back button is visible and enabled
+                        //     oBackButton.setVisible(true);  // Ensure the button is visible
+                        //     oBackButton.setEnabled(true);  // Ensure the button is enabled
+                        // }
+
+                        // var oBackButton = this.byId("bck2line");
+
+                        // if (oBackButton) {
+                        //     oBackButton.setVisible(true);  // Force visibility
+                        //     oBackButton.setEnabled(true);  // Force enablement
+                        // }
+                    
+                        // // Check if flip container is causing issues
+                        // var oFlipContainer = this.byId("flipContainer");
+                        // if (oFlipContainer && oFlipContainer.hasStyleClass("flipped")) {
+                        //     oFlipContainer.removeStyleClass("flipped");  // Ensure it's in the correct state
+                        // }
                     },
+
+                    // onBeforeRendering: function () {
+                    //     var oModel = this.getView().getModel();
+                    //     if (oModel) {
+                    //         oModel.refresh(true); // Refresh the model if necessary
+                    //     }
+                    // },
+                    
                     onCellHover: function(oItem) {
                         var oContext = oItem.getBindingContext("errorCountModel");
                         if (oContext) {
@@ -1438,119 +1648,161 @@ sap.ui.define([
 
 
 
+
                     // onSelectLineChart: function (oEvent) {
-                        // var oFlipContainer = this.byId("flipContainer");
-                        // var oLineChartContainer = this.byId("lineChartContainer");
-                        // var oBarChartContainer = this.byId("barChartContainer");
+                    //     var oSelectedData = oEvent.getParameter("data"); // Get the selected data points
+                    //     var oVizFrame = this.getView().byId("idBarChart");
                     
-                        // // Toggle visibility
-                        // if (oLineChartContainer.getVisible()) {
-                        //     oLineChartContainer.setVisible(false);
-                        //     oBarChartContainer.setVisible(true);
-                        //     oFlipContainer.addStyleClass("flip-active"); // Add flip-active class for animation
-                        // } else {
-                        //     oLineChartContainer.setVisible(true);
-                        //     oBarChartContainer.setVisible(false);
-                        //     oFlipContainer.removeStyleClass("flip-active"); // Remove flip-active class
+                    //     if (oSelectedData && oSelectedData.length > 0) {
+                    //         var selectedReading = oSelectedData[0].data.Timestamp;
+                    
+                    //         // Get the tenant data for the selected timestamp
+                    //         var selectedTenantData = this._tenantData[selectedReading] || {};
+                    
+                    //         // Prepare the tenant data for the bar chart
+                    //         var barData = Object.keys(selectedTenantData).map(function(tenant) {
+                    //             return {
+                    //                 Category: tenant,
+                    //                 Value: selectedTenantData[tenant]
+                    //             };
+                    //         });
+                    
+                    //         // Check the maximum value from barData
+                    //         var maxValue = Math.max(...barData.map(item => item.Value));
+                    
+                    //         // If the maximum value is <= 2, set the Y-axis range to be fixed, else make it dynamic
+                    //         if (maxValue <= 2) {
+                    //             this.updateBarYAxisRange(barData, 0, 4); // Fixed range between 0 and 4
+                    //         } else {
+                    //             oVizFrame.setVizProperties({
+                    //                 "plotArea": {
+                    //                     "primaryScale": {
+                    //                         "fixedRange": false
+                    //                     }
+                    //                 }
+                    //             });
+                    //         }
+                    
+                    //         // Flip to bar chart and update the data
+                    //         this._flipToBarChart(selectedReading);  // Flip to bar chart
+                    //         this._updateBarChartData(barData);      // Pass the tenant data to the bar chart
+                    //     } else {
+                    //         console.warn("No data point selected");
                     //     }
                     // },
 
 
 
+                    onSelectLineChart: function (oEvent) {
+                        var oSelectedData = oEvent.getParameter("data"); // Get the selected data points
+                        var oVizFrame = this.getView().byId("idBarChart");
+                    
+                        if (oSelectedData && oSelectedData.length > 0) {
+                            var selectedReading = oSelectedData[0].data.Timestamp;
+                    
+                            // Get the tenant data for the selected timestamp
+                            var selectedTenantData = this._tenantData[selectedReading] || {};
+                    
+                            // Prepare the tenant data for the bar chart
+                            var barData = Object.keys(selectedTenantData).map(function (tenant) {
+                                return {
+                                    Category: tenant,
+                                    Value: selectedTenantData[tenant].count // Use the count for the bar chart value
+                                };
+                            });
+                    
+                            // Prepare the tenant IDs mapping
+                            var tenantIds = Object.keys(selectedTenantData).reduce(function (acc, tenant) {
+                                acc[tenant] = selectedTenantData[tenant].ids; // Store IDs for each tenant
+                                return acc;
+                            }, {});
+                    
+                            // Check the maximum value from barData
+                            var maxValue = Math.max(...barData.map(item => item.Value));
+                    
+                            // If the maximum value is <= 2, set the Y-axis range to be fixed, else make it dynamic
+                            if (maxValue <= 2) {
+                                this.updateBarYAxisRange(barData, 0, 4); // Fixed range between 0 and 4
+                            } else {
+                                oVizFrame.setVizProperties({
+                                    "plotArea": {
+                                        "primaryScale": {
+                                            "fixedRange": false
+                                        }
+                                    }
+                                });
+                            }
+                    
+                            // Flip to bar chart and update the data
+                            this._flipToBarChart(selectedReading);  // Flip to bar chart
+                            this._updateBarChartData(barData);      // Pass the tenant data to the bar chart
+                    
+                            // Bind the tenant IDs to the bar chart for later use
+                            oVizFrame.data("tenantIds", tenantIds); // Attach tenant IDs to the VizFrame using custom data
+                        } else {
+                            console.warn("No data point selected");
+                        }
+                    },
+                    
 
-    //                 onSelectLineChart: function (oEvent) {
-    //                     var oSelectedData = oEvent.getParameter("data"); // Get the selected data points
+                    // onSelectLineChart: function (oEvent) {
+                    //     var oSelectedData = oEvent.getParameter("data"); // Get the selected data points
+                    //     var oVizFrame = this.getView().byId("idBarChart");
                     
-    //                     if (oSelectedData && oSelectedData.length > 0) {
-    //                         // Access the first selected data point
-    //                         var selectedReading = oSelectedData[0].data.Timestamp; // Replace 'Timestamp' with the actual dimension name in your dataset
-                            
-    //                         // Flip the chart
-    //                         this._flipCharts();
+                    //     if (oSelectedData && oSelectedData.length > 0) {
+                    //         var selectedReading = oSelectedData[0].data.Timestamp;
                     
-    //                         // Update the bar chart data based on the selected reading
-    //                         this._updateBarChartData(selectedReading);
-    //                     } else {
-    //                         console.warn("No data point selected");
-    //                     }
-    //                 },
+                    //         // Get the tenant data for the selected timestamp
+                    //         var selectedTenantData = this._tenantData[selectedReading] || {};
                     
-    //                 // Function to apply the flip animation
-    //                 _flipCharts: function () {
-    //                     // // var oFlipContainer = this.byId("flipContainer");
-    //                     // // oFlipContainer.addStyleClass("flipped");
+                    //         // Prepare the tenant data for the bar chart
+                    //         var barData = Object.keys(selectedTenantData).map(function (tenant) {
+                    //             return {
+                    //                 Category: tenant,
+                    //                 Value: selectedTenantData[tenant].count // Use the count for the bar chart value
+                    //             };
+                    //         });
 
-    //                     // var oFlipContainer = this.byId("flipContainer");
-    //                     // var oLineChartContainer = this.byId("lineChartContainer");
-    //                     // var oBarChartContainer = this.byId("barChartContainer");
-                    
-    //                     // // Toggle visibility
-    //                     // if (oLineChartContainer.getVisible()) {
-    //                     //     oLineChartContainer.setVisible(false);
-    //                     //     oBarChartContainer.setVisible(true);
-    //                     //     oFlipContainer.addStyleClass("flip-active"); // Add flip-active class for animation
-    //                     // } else {
-    //                     //     oLineChartContainer.setVisible(true);
-    //                     //     oBarChartContainer.setVisible(false);
-    //                     //     oFlipContainer.removeStyleClass("flip-active");
-    //                     // }
 
-    //                     var oFlipContainer = this.byId("flipContainer");
-    // var oLineChartContainer = this.byId("lineChartContainer");
-    // var oBarChartContainer = this.byId("barChartContainer");
 
-    // if (oFlipContainer.hasStyleClass("flipped")) {
-    //     // Flip back to front
-    //     oFlipContainer.removeStyleClass("flipped");
-    //     oLineChartContainer.setVisible(true);
-    //     oBarChartContainer.setVisible(false);
-    // } else {
-    //     // Flip to back
-    //     oFlipContainer.addStyleClass("flipped");
-    //     oLineChartContainer.setVisible(false);
-    //     oBarChartContainer.setVisible(true);
-    // }
-    //                 },
                     
-    //                 // Function to update the bar chart data based on the selected reading
-                    // _updateBarChartData: function (selectedReading) {
-                    //     // Get the barModel
-                    //     var oBarModel = this.getView().getModel("barModel");
+                    //         this._selectedCategory = {}; // Reset previous data
+                    //         this._selectedIds = {};      // Reset previous data
                     
-                    //     // Check if the model exists
-                    //     if (!oBarModel) {
-                    //         console.error("barModel is not defined or not set on the view.");
-                    //         return;
+                    //         // Populate _selectedCategory and _selectedIds
+                    //         Object.keys(selectedTenantData).forEach(function (tenant) {
+                    //             this._selectedCategory[tenant] = tenant;             // Store the tenant as the category
+                    //             this._selectedIds[tenant] = selectedTenantData[tenant].ids; // Store IDs for each tenant
+                    //         }.bind(this));
+
+
+
+                    
+                    //         // Check the maximum value from barData
+                    //         var maxValue = Math.max(...barData.map(item => item.Value));
+                    
+                    //         // If the maximum value is <= 2, set the Y-axis range to be fixed, else make it dynamic
+                    //         if (maxValue <= 2) {
+                    //             this.updateBarYAxisRange(barData, 0, 4); // Fixed range between 0 and 4
+                    //         } else {
+                    //             oVizFrame.setVizProperties({
+                    //                 "plotArea": {
+                    //                     "primaryScale": {
+                    //                         "fixedRange": false
+                    //                     }
+                    //                 }
+                    //             });
+                    //         }
+                    
+                    //         // Flip to bar chart and update the data
+                    //         this._flipToBarChart(selectedReading);  // Flip to bar chart
+                    //         this._updateBarChartData(barData);      // Pass the tenant data to the bar chart
+                    //     } else {
+                    //         console.warn("No data point selected");
                     //     }
-                    
-                    //     // Sample data update logic
-                    //     var oData = {
-                    //         BarData: [
-                    //             { Category: "Category 1", Value: 20 },
-                    //             { Category: "Category 2", Value: 40 },
-                    //             { Category: "Category 3", Value: 60 }
-                    //         ]
-                    //     };
-                    
-                    //     // Update the model with new data
-                    //     oBarModel.setData(oData);
                     // },
-
-
-    onSelectLineChart: function (oEvent) {
-        var oSelectedData = oEvent.getParameter("data"); // Get the selected data points
-    
-        if (oSelectedData && oSelectedData.length > 0) {
-            // Access the first selected data point
-            var selectedReading = oSelectedData[0].data.Timestamp;
-    
-            // Trigger the flip animation
-            this._flipToBarChart(selectedReading);
-            this._updateBarChartData(selectedReading);
-        } else {
-            console.warn("No data point selected");
-        }
-    },
+                    
+                    
     
     _flipToBarChart: function (selectedReading) {
         var oFlipContainer = this.byId("flipContainer");
@@ -1568,45 +1820,19 @@ sap.ui.define([
     },
     
 
-    _updateBarChartData: function (selectedReading) {
-        // Get the barModel
+    _updateBarChartData: function (barData) {
         var oBarModel = this.getView().getModel("barModel");
-    
-        // Check if the model exists
         if (!oBarModel) {
             console.error("barModel is not defined or not set on the view.");
             return;
         }
     
-        // Sample data update logic
-        var oData = {
-            BarData: [
-                { Category: "Category 1", Value: 20 },
-                { Category: "Category 2", Value: 40 },
-                { Category: "Category 3", Value: 60 }
-            ]
-        };
-    
-        // Update the model with new data
-        oBarModel.setData(oData);
+        // Set the bar chart data
+        oBarModel.setData({
+            BarData: barData
+        });
     },
-
-                      
-
-
-                    // onBackToLineChart: function () {
-                    //     // Get references to the containers
-                    //     var oFlipContainer = this.byId("flipContainer");
-                    //     var oLineChartContainer = this.byId("lineChartContainer");
-                    //     var oBarChartContainer = this.byId("barChartContainer");
-                    
-                    //     // Flip back to the line chart
-                    //     if (oFlipContainer.hasStyleClass("flipped")) {
-                    //         oFlipContainer.removeStyleClass("flipped");
-                    //         oLineChartContainer.setVisible(true);
-                    //         oBarChartContainer.setVisible(false);
-                    //     }
-                    // }
+    
 
 
 
@@ -1626,10 +1852,255 @@ sap.ui.define([
                         }, 600); // Match the CSS transition duration
                     },
                     
+
+                    // onBackToLineChart: function () {
+                    //     var oFlipContainer = this.byId("flipContainer");
+                    //     var oLineChartContainer = this.byId("lineChartContainer");
+                    //     var oBarChartContainer = this.byId("barChartContainer");
+                    //     var oBackButton = this.byId("bck2line");  // Ensure the back button is part of the view
+                    
+                    //     // Remove the 'flipped' class for animation
+                    //     oFlipContainer.removeStyleClass("flipped");
+                    
+                    //     // Ensure the back button is visible when navigating back
+                    //     if (oBackButton) {
+                    //         oBackButton.setVisible(true);
+                    //         oBackButton.setEnabled(true);  // Make sure it is enabled
+                    //     }
+                    
+                    //     // Delay visibility changes for seamless animation
+                    //     setTimeout(function () {
+                    //         oBarChartContainer.setVisible(false);
+                    //         oLineChartContainer.setVisible(true);
+                    //     }, 600); // Match the CSS transition duration
+                    // },
                     
                     
                     
                     
+                    onPieSelect: function (oEvent) {
+                        var oSelectedData = oEvent.getParameter("data"); // Get the selected Pie chart data point
+                    
+                        if (oSelectedData && oSelectedData.length > 0) {
+                            var selectedStatus = oSelectedData[0].data.ProcessName;
+                    
+                            // Ensure _tenantDataByStatus is defined
+                            if (!this._tenantDataByStatus) {
+                                console.error("tenantDataByStatus is not available");
+                                return;
+                            }
+                    
+                            var tenantDataByStatus = this._tenantDataByStatus[selectedStatus] || {};
+                    
+                            // Prepare tenant data for the Donut chart
+                            var donutData = Object.keys(tenantDataByStatus).map(function (tenant) {
+                                return {
+                                    Category: tenant,
+                                    Value: tenantDataByStatus[tenant]
+                                };
+                            });
+                    
+                            // Flip to donut chart
+                            this._flipToDonutChart(selectedStatus);
+                    
+                            // Update donut chart with tenant data
+                            this._updateDonutChartData(donutData);
+                        } else {
+                            console.warn("No data point selected");
+                        }
+                    },
+                    
+                     
+
+                    _flipToDonutChart: function (selectedReading) {
+                        var oFlipContainer = this.byId("flippContainer");
+                        // var oLineChartContainer = this.byId("lineChartContainer");
+                        var oDonutChartContainer = this.byId("donutChartContainer");
+                    
+                        // Add the 'flipped' class for animation
+                        oFlipContainer.addStyleClass("flipped");
+                    
+                        // Delay setting the visibility to avoid interrupting the animation
+                        setTimeout(function () {
+                            // oLineChartContainer.setVisible(false);
+                            oDonutChartContainer.setVisible(true);
+                        }, 400); // Match the CSS transition duration
+                    },
+                    
+                    _updateDonutChartData: function (donutData) {
+                        var oDonutModel = this.getView().getModel("donutModel");
+                        if (!oDonutModel) {
+                            console.error("donutModel is not defined or not set on the view.");
+                            return;
+                        }
+                    
+                        // Set the donut chart data
+                        oDonutModel.setData({
+                            DonutData: donutData
+                        });
+                    },
+                    
+                    
+                    onBackToPieChart:function()
+                    {
+                        var oFlipContainer = this.byId("flippContainer");
+                        var oPieChartContainer = this.byId("pieChartContainer");
+                        var oDonutChartContainer = this.byId("donutChartContainer");
+                    
+                        // Remove the 'flipped' class for animation
+                        oFlipContainer.removeStyleClass("flipped");
+                    
+                        // Delay visibility changes for seamless animation
+                        setTimeout(function () {
+                            oDonutChartContainer.setVisible(false);
+                            oPieChartContainer.setVisible(true);
+                        }, 600); // Match the CSS transition duration
+                    },
+
+                    updateBarYAxisRange: function (barData, min, max) {
+                        var oVizFrame = this.getView().byId("idBarChart"); // Assuming the bar chart's ID is idBarChart
+                    
+                        var oVizProperties = {
+                            "plotArea": {
+                                "dataLabel": {
+                                    "visible": true
+                                },
+                                "primaryScale": {
+                                    "fixedRange": true,  // Set the fixed range based on value check
+                                    "minValue": min,     // Min value for Y-axis
+                                    "maxValue": max      // Max value for Y-axis
+                                }
+                            }
+                        };
+                    
+                        oVizFrame.setVizProperties(oVizProperties);
+                    },
+                    
+
+
+                    // onSelectBarChart:function(){    
+                    //     var oRouter = this.getOwnerComponent().getRouter();
+                    //     oRouter.navTo("selectedprocessdetails");
+                    //             }
+
+
+                    // onSelectBarChart: function (oEvent) {
+                    //     var oSelectedData = oEvent.getParameter("data"); // Get the selected data points
+                    
+                    //     if (oSelectedData && oSelectedData.length > 0) {
+                    //         // Ensure data exists and contains the 'Category' property
+                    //         var selectedCategory = oSelectedData[0]?.data?.Category; // Safely access the selected category
+                    
+                    //         if (selectedCategory) {
+                    //             // Retrieve IDs for the selected category (tenant)
+                    //             var selectedIds = this._selectedIds[selectedCategory];
+                    
+                    //             if (selectedIds) {
+                    //                 console.log("Selected Tenant:", selectedCategory);
+                    //                 console.log("Process IDs:", selectedIds);
+                    
+                    //                 // Perform any additional logic with the selected IDs
+                    //             } else {
+                    //                 console.warn("No IDs found for the selected category:", selectedCategory);
+                    //             }
+                    //         } else {
+                    //             console.warn("No valid category found in the selected data.");
+                    //         }
+                    //     } else {
+                    //         console.warn("No data point selected in bar chart");
+                    //     }
+                    // }
+                    
+
+
+                    // onSelectBarChart: function (oEvent) {
+                    //     var oSelectedData = oEvent.getParameter("data"); // Get the selected data points
+                    
+                    //     if (oSelectedData && oSelectedData.length > 0) {
+                    //         var selectedCategory = oSelectedData[0]?.data?.Category; // Safely access the selected category
+                    
+                    //         if (selectedCategory && this._selectedIds[selectedCategory]) {
+                    //             var selectedIds = this._selectedIds[selectedCategory]; // Access IDs using the global variable
+                    
+                    //             console.log("Selected Tenant:", selectedCategory);
+                    //             console.log("Process IDs:", selectedIds);
+                    
+                    //             // Perform any additional logic with the selected IDs
+                    //         } else {
+                    //             console.warn("No IDs found for the selected category:", selectedCategory);
+                    //         }
+                    //     } else {
+                    //         console.warn("No data point selected in bar chart");
+                    //     }
+                    // }
+
+
+                    onSelectBarChart: function (oEvent) {
+                        var oSelectedData = oEvent.getParameter("data");
+                    
+                        if (oSelectedData && oSelectedData.length > 0) {
+                            var oVizFrame = this.getView().byId("idBarChart");
+                            var tenantIds = oVizFrame.data("tenantIds"); 
+                    
+                            var selectedTenant = oSelectedData[0].data.Tenant;
+                            var selectedIds = tenantIds[selectedTenant];
+                            
+                            var oRouter = this.getOwnerComponent().getRouter();
+                            oRouter.navTo("selectedprocessdetails", { 
+                                Tenant: selectedTenant,
+                                IDs: selectedIds
+                            });
+                    
+                            // Reset the back button when navigating away from the bar chart
+                            var oBackButton = this.byId("backButton");
+                            if (oBackButton) {
+                                oBackButton.setVisible(true);  // Ensure it's visible
+                                oBackButton.setEnabled(true);  // Ensure it's enabled
+                            }
+                        }
+                    },
+                    
+
+
+
+                    onSelectBarChart: function (oEvent) {
+                        var oSelectedData = oEvent.getParameter("data"); // Get the selected data points
+                    
+                        if (oSelectedData && oSelectedData.length > 0) {
+                            var oVizFrame = this.getView().byId("idBarChart");
+                            var tenantIds = oVizFrame.data("tenantIds"); // Retrieve tenant IDs from the VizFrame
+
+
+                            var selectedTenant = oSelectedData[0].data.Tenant;
+                            var selectedIds = tenantIds[selectedTenant];
+                            
+                            var oRouter = this.getOwnerComponent().getRouter();
+                            oRouter.navTo("selectedprocessdetails", { 
+                                Tenant: selectedTenant ,
+                                IDs: selectedIds });
+
+
+                    
+                        //     var selectedCategory = oSelectedData[0]?.data?.Category; // Safely access the selected category
+                    
+                        //     if (selectedCategory && tenantIds[selectedCategory]) {
+                        //         var selectedIds = tenantIds[selectedCategory]; // Access IDs using the stored data
+                    
+                        //         console.log("Selected Tenant:", selectedCategory);
+                        //         console.log("Process IDs:", selectedIds);
+                    
+                        //         // Perform any additional logic with the selected IDs
+                        //     } else {
+                        //         console.warn("No IDs found for the selected category:", selectedCategory);
+                        //     }
+                        // } else {
+                            console.warn("No data point selected in bar chart");
+                        }
+                    }
+                    
+                    
+                    
+
 
                 });
             
