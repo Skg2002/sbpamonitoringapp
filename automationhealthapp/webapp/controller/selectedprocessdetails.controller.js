@@ -174,6 +174,7 @@ onSortToggle: function (oEvent) {
             });
             
             oBinding.filter(nameLengthFilter);
+            this._updateItemCountForStatus(oBinding);
 
     },
     onSelectionChange : function (oEvent) {
@@ -191,11 +192,27 @@ onSortToggle: function (oEvent) {
                     aFilters.push(new sap.ui.model.Filter("status", sap.ui.model.FilterOperator.EQ, sStatus));
                 });
            }
+          
 
         // Apply the filter to the table
         oBinding.filter(aFilters, "Application");
-            }
+        this._updateItemCountForStatus(oBinding);
+            },
 
+            _updateItemCountForStatus: function (oBinding) {
+                var oTable = this.byId("idProcessTables");
+                var iFilteredCount = oBinding.getLength(); // Get the count of filtered items
+                
+                // Update the Title text
+                var oTitle = oTable.getHeaderToolbar().getContent()[0]; // Assuming the Title is the first control in the Toolbar
+                oTitle.setText("Items(" + iFilteredCount + ")");
+            },
+
+            onBackToOverview: function()
+            {
+                var oRouter = this.getOwnerComponent().getRouter();
+                oRouter.navTo("Routeautomationhealthview");
+            }
 
     });
             

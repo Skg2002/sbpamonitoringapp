@@ -15,9 +15,16 @@
                 <f:title>
                     <f:DynamicPageTitle>
                         <f:heading>
+                               
+                            
                             <VBox>
-                                <Title text="Process and Workflow Instances" wrapping="true"/>
+                            <HBox >
+                            <Button icon="sap-icon://arrow-left" press="onBackToOverview" />
+                            </HBox>
+                            <HBox>
+                                <Title text="Process Details" wrapping="true"/>
                                 <SearchField id="headerSearchs" visible="false"/>
+                                </HBox>
                             </VBox>
                         </f:heading>
                         <f:breadcrumbs>
@@ -88,7 +95,7 @@
                         <Table id="idProcessTables" selectionChange=".onSelectionChangesforcondition" mode="MultiSelect" sticky="HeaderToolbar,ColumnHeaders" inset="false" items="{tableModel>/workflows}" class="sapFDynamicPageAlignContent" width="auto" alternateRowColors="true">
                             <headerToolbar>
                                 <Toolbar>
-                                    <Title text="{='Items(' + ${tableModel>/}.length + ')'}" level="H2"/>
+                                    <Title text="{='Items(' + ${tableModel>/workflows}.length + ')'}" level="H2"/>
                                     <ToolbarSpacer/>
                                 </Toolbar>
                             </headerToolbar>

@@ -20,8 +20,6 @@ sap.ui.define([
             var oDonutModel = new sap.ui.model.json.JSONModel();
             this.getView().setModel(oDonutModel, "donutModel");
 
-
-
             var automationDetailsModel = new sap.ui.model.json.JSONModel({
                 instances: [],
                 failedCounts: [],
@@ -41,6 +39,9 @@ sap.ui.define([
             //     oBackButton.setEnabled(true); // Ensure it's enabled
             // }
 
+             // Attach routing lifecycle function
+    
+
 
             
             var oVizLineFrame = this.getView().byId("idLineChart");
@@ -49,8 +50,7 @@ sap.ui.define([
             var ovizErrorLine=this.getView().byId("lineChart");
             var ovizErrorCode=this.getView().byId("idVizFrames");
             var oVizBarFrame = this.getView().byId("idBarChart");
-            var oVizDonutFrame = this.getView().byId("idDonutChart");
-            var oPopover = this.byId("lineChartPopover");
+           
 
             // Set VizFrame properties, including title
             oVizLineFrame.setVizProperties({
@@ -111,22 +111,7 @@ sap.ui.define([
                     text: "Tenant-wise Process Visualization"
                 }
             });
-            oVizDonutFrame.setVizProperties({
-                title: {
-                    visible: true,
-                    text: "Tenant-wise Process Visualization"
-                }
-            });
-
-
-            // this._popover = new Popover({
-            //     placement: "Bottom",
-            //     content: new Text({ text: "" })
-            // });
-
-            // oVizLineFrame.attachRenderComplete(function () {
-            //     oPopover.connect(oVizLineFrame.getVizUid());
-            // });
+            
             this.fetchedData = [];
             this._selectedStatuses = [];
             let oDateRangeSelection = this.byId("dateTimePicker");
@@ -156,6 +141,7 @@ sap.ui.define([
         },
 
 
+        
         // onIconTabFilterSelect: function (oEvent) {
         //     const sSelectedKey = oEvent.getParameter("key");
         
@@ -1905,10 +1891,22 @@ sap.ui.define([
                     
                             // Update donut chart with tenant data
                             this._updateDonutChartData(donutData);
+                    
+                            // Get the Donut chart viz frame
+                            var oVizDonutFrame = this.getView().byId("idDonutChart");
+                    
+                            // Dynamically set the title of the Donut chart
+                            oVizDonutFrame.setVizProperties({
+                                title: {
+                                    visible: true,
+                                    text: "Tenant-wise '" + selectedStatus + "' Process Visualization"  // Add selectedStatus to title
+                                }
+                            });
                         } else {
                             console.warn("No data point selected");
                         }
                     },
+                    
                     
                      
 
@@ -1924,7 +1922,7 @@ sap.ui.define([
                         setTimeout(function () {
                             // oLineChartContainer.setVisible(false);
                             oDonutChartContainer.setVisible(true);
-                        }, 400); // Match the CSS transition duration
+                        }, 300); // Match the CSS transition duration
                     },
                     
                     _updateDonutChartData: function (donutData) {
@@ -2096,10 +2094,7 @@ sap.ui.define([
                         // } else {
                             console.warn("No data point selected in bar chart");
                         }
-                    }
-                    
-                    
-                    
+                    },                  
 
 
                 });
