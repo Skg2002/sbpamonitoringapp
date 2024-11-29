@@ -13,26 +13,9 @@
           xmlns:layout="sap.ui.layout"
            >
 
-    <!-- Dynamic Page Layout -->
-      <!-- <MessageStrip 
-                    id="warningMessageStripp" 
-                    text="Please note that the data may take a few seconds to load. If you encounter any issues, try refreshing the page." 
-                    type="Warning" 
-                    showCloseButton="true"
-                    showIcon="true"
-                    visible="true"
-                    class="sapUiSmallMargin"/> -->
+    
     <f:DynamicPage id="dynamicPage" backgroundDesign="Solid">
 
-    <!-- <MessageStrip 
-            id="warningMessageStripp" 
-            text="{appModel>/botMessage/value/0/message/tenantMessage}" 
-            type="Warning" 
-            showCloseButton="true"
-            showIcon="true"
-            visible="true"
-            class="sapUiSmallMargin"/> -->
-        <!-- Page Title -->
         <f:title>
             <f:DynamicPageTitle>
                 <f:heading>
@@ -80,16 +63,7 @@
 
                           <fb:FilterGroupItem name="Tenant" groupName="Group0" label="Tenant" visibleInFilterBar="true">
                           <fb:control> 
-                            <!-- <MultiComboBox
-                                id="tenantBox"
-                                width="20%"
-                                placeholder="Select SBPA Tenants"
-                                selectionChange="onTenantChange"  
-                                class="sapUiSmallMarginBottom"
-                                items="{destinationModel>/}">
-                                <core:ListItem key="{destinationModel>dest_name}" text="{destinationModel>display_Name}" />
-                            </MultiComboBox> -->
-
+                            
                             <MultiInput width="100%" id="multiInput"
                                         value=""
                                         suggestionItems="{
@@ -130,17 +104,7 @@
         <!-- Dynamic Page Content -->
         <f:content>
             <VBox>
-                <!-- Message Strip -->
-                <!-- <MessageStrip 
-                    id="warningMessageStrip" 
-                    text="{appModel>/botMessage/value/0/message/tenantMessage}" 
-                    type="Warning" 
-                    showCloseButton="true"
-                    showIcon="true"
-                    visible="true"
-                    class="sapUiSmallMargin"/> -->
-
-                <!-- Scroll Container -->
+             
                 <ScrollContainer horizontal="false" vertical="true" height="100%">
                     <IconTabBar select=".onIconTabFilterSelect">
                         <items>
@@ -207,7 +171,7 @@
         <VBox class="flipper">
             <!-- Front Side (Line Chart) -->
             <VBox id="lineChartContainer" class="flip-front" visible="true" width="100%">
-                <viz:VizFrame id="idLineChart" vizType="line" height="400px" width="100%" selectData="onSelectLineChart">
+                <viz:VizFrame id="idLineChart" vizType="line" height="400px" width="100%" selectData="onSelectLineChart" legendVisible="false">
                     <viz:dataset>
                         <viz.data:FlattenedDataset data="{lineModel>/LineData}">
                             <viz.data:dimensions>
@@ -228,7 +192,7 @@
             <!-- Back Side (Bar Chart) -->
             <VBox id="barChartContainer" class="flip-back" visible="false" width="100%">
                 <Button icon="sap-icon://nav-back" press="onBackToLineChart" id="bck2line" />
-                <viz:VizFrame id="idBarChart" height="400px" width="100%" selectData="onSelectBarChart">
+                <viz:VizFrame id="idBarChart" height="400px" width="100%" selectData="onSelectBarChart" legendVisible="false">
                     <viz:dataset>
                         <viz.data:FlattenedDataset data="{barModel>/BarData}">
                             <viz.data:dimensions>

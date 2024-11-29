@@ -19,10 +19,10 @@
                             
                             <VBox>
                             <HBox >
-                            <Button icon="sap-icon://arrow-left" press="onBackToOverview" />
+                            <!-- <Button icon="sap-icon://arrow-left" press="onBackToOverview" /> -->
                             </HBox>
                             <HBox>
-                                <Title text="Process Details" wrapping="true"/>
+                                  <Title id="dynamicPageTitle" text="Process Details" wrapping="true"/>
                                 <SearchField id="headerSearchs" visible="false"/>
                                 </HBox>
                             </VBox>
@@ -41,7 +41,7 @@
                             <fb:FilterBar id="filterbarx" useToolbar="false" showGoOnFB="false" showFilterConfiguration="false">
                                 <fb:filterGroupItems>
 
-                                    <fb:FilterGroupItem name="search" groupName="Group0" label="" visibleInFilterBar="true">
+                                    <fb:FilterGroupItem name="search"  groupName="Group0" label="Processes" visibleInFilterBar="true">
                                         <fb:control>
                                             <HBox>
                                                 <SearchField width="100%" search=".onSearch" placeholder="Search for processes" id="searchFilter"/>
@@ -63,17 +63,9 @@
                                         </fb:control>
                                     </fb:FilterGroupItem>
 
-                                    <fb:FilterGroupItem name="Definition" label="Definition" groupName="Group1" visibleInFilterBar="true">
-                                        <fb:control>
-                                            <HBox>
-                                                <MultiComboBox id="definitionids" placeholder="Select one or more ids" width="500%" name="Definition" selectionChange=".onSelectionChangefordefinition" items="{newModel>/}">
-                                                    <core:Item key="{newModel>id}" text="{newModel>name}"/>
-                                                </MultiComboBox>
-                                            </HBox>
-                                        </fb:control>
-                                    </fb:FilterGroupItem>
+                                   
 
-                                    <fb:FilterGroupItem name="Tenants" label="Tenants" groupName="Group1" visibleInFilterBar="true">
+                                    <!-- <fb:FilterGroupItem name="Tenants" label="Tenants" groupName="Group1" visibleInFilterBar="true">
                                         <fb:control>
                                             <HBox>
                                                 <MultiInput width="100%"  value="" suggestionItems="{ path: 'wfModel>/Destinations', sorter: { path: 'wfModel>display_Name' } }" valueHelpRequest="handleValueHelp" tokenUpdate="onTokenUpdate">
@@ -81,7 +73,7 @@
                                                 </MultiInput>
                                             </HBox>
                                         </fb:control>
-                                    </fb:FilterGroupItem>
+                                    </fb:FilterGroupItem> -->
 
                                 </fb:filterGroupItems>
                             </fb:FilterBar>
@@ -92,33 +84,35 @@
 
                 <f:content>
                     <VBox>
-                        <Table id="idProcessTables" selectionChange=".onSelectionChangesforcondition" mode="MultiSelect" sticky="HeaderToolbar,ColumnHeaders" inset="false" items="{tableModel>/workflows}" class="sapFDynamicPageAlignContent" width="auto" alternateRowColors="true">
+                        <Table id="idProcessTables" selectionChange=".onSelectionChangesforcondition" sticky="HeaderToolbar,ColumnHeaders" inset="false" items="{tableModel>/workflows}" class="sapFDynamicPageAlignContent" width="auto" alternateRowColors="true">
                             <headerToolbar>
                                 <Toolbar>
-                                    <Title text="{='Items(' + ${tableModel>/workflows}.length + ')'}" level="H2"/>
+                                   <!-- <Title id="tableTitle" text="Items (0)" level="H2"/> -->
+                                    <Title id="tableTitle" text="{='Items(' + ${tableModel>/workflows}.length + ')'}" level="H2"/>
                                     <ToolbarSpacer/>
+                                    <Button id="DownloadButton" icon="sap-icon://download" type="Accept" press="onDownload"/>
                                 </Toolbar>
                             </headerToolbar>
                             <columns>
-                                <Column>
+                                <Column width="7%">
                                     <Text text=""/>
                                 </Column>
-                                <Column hAlign="Left">
+                                <!-- <Column hAlign="Left">
                                     <Text text="Tenant Name"/>
-                                </Column>
+                                </Column> -->
                                 <Column>
                                     <Text text="Name"/>
                                 </Column>
-                                <Column>
+                                <Column  width="12%">
                                     <Text text="Status"/>
                                 </Column>
-                                <Column>
+                                <Column width="10%">
                                     <Text text="Environment"/>
                                 </Column>
-                                <Column hAlign="Center">
+                                <Column hAlign="Initial" width="5%">
                                     <Text text="Project"/>
                                 </Column>
-                                <Column hAlign="Center">
+                                <Column hAlign="Center" width="25%">
                                     <Text text="Started By"/>
                                 </Column>
                                 <Column hAlign="Center">
@@ -135,13 +129,13 @@
                                 </Column>
                             </columns>
                             <items>
-                                <ColumnListItem type="Navigation" press="Fclayout">
+                                <ColumnListItem press="Fclayout">
                                     <cells>
                                         <Avatar src="sap-icon://process" displayShape="Square" backgroundColor="Accent7" class="icon-process" displaySize="XS"/>
-                                        <Text text="{tableModel>tenant}"/>
+                                        <!-- <Text text="{tableModel>tenant}"/> -->
                                         <Text text="{tableModel>subject}"/>
                                         <ObjectStatus class="ObjectStatusForStatus" inverted="true" text="{tableModel>status}" state="{parts: [{path: 'tableModel>status'}], formatter: '.formatter.onAdd'}"/>
-                                        <Text text="{tableModel>environmentId}"/>
+                                        <Text text="{tableModel>environmentId}"  class="sapUiTinyMarginEnd"/>
                                         <Text text="{tableModel>projectVersion}"/>
                                         <Text text="{tableModel>startedBy}"/>
                                         <Text text="{path:'tableModel>startedAt', formatter:'.formatter.formatDate'}"/>
