@@ -1,0 +1,177 @@
+<mvc:View xmlns:mvc="sap.ui.core.mvc" 
+          xmlns:core="sap.ui.core"
+          controllerName="automationhealthapp.controller.Automationdetail"
+          xmlns="sap.m" 
+          xmlns:viz="sap.viz.ui5.controls"
+          xmlns:controls="sap.ui.core.Control"
+          xmlns:layout="sap.ui.layout"
+          xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds"
+          xmlns:viz.data="sap.viz.ui5.data"
+          xmlns:f="sap.f"
+          xmlns:fb="sap.ui.comp.filterbar">
+
+    <f:DynamicPage id="idDynamicPage">
+            <f:title>
+                <f:DynamicPageTitle>
+                    <f:heading>
+                        <Title text="Automation Jobs"></Title>
+                    </f:heading>
+                </f:DynamicPageTitle>
+            </f:title>
+        <f:header>
+            <f:DynamicPageHeader pinnable="false">
+                <VBox>
+                    <fb:FilterBar id="idFilterBar" search="onFilterSearch" showGoOnFB="false" showFilterConfiguration="false" useToolbar="false">
+                        <fb:filterGroupItems>
+                                <fb:FilterGroupItem name="Start Date" label="Start Date" groupName="Group1" visibleInFilterBar="true" hiddenFilter="false" >
+                                    <fb:control>
+                                         <Text id="startText" text="" width="20px"></Text>
+                                        <!-- <DateRangeSelection id="detailDateRange" dateValue="" secondDateValue="" displayFormat="long" width="20vw"></DateRangeSelection> -->
+                                    </fb:control>
+                                </fb:FilterGroupItem>
+                                <fb:FilterGroupItem name="End Date" label="End Date" groupName="Group1" visibleInFilterBar="true" hiddenFilter="false" >
+                                    <fb:control>
+                                         <Text id="endText" text=""  width="20px"></Text>
+                                    </fb:control>
+                                </fb:FilterGroupItem>
+                                 <fb:FilterGroupItem name="Automation Name" label="Automation Name" groupName="Group1" visibleInFilterBar="true">
+                                    <fb:control>
+                                        <MultiComboBox 
+                                            id="automationNamesComboBox"
+                                            showSelectAll="true"
+                                            placeholder="Select any Automation "
+                                            selectionChange=".onAutomationSelectionChange"
+                                            items="{
+                                                path: 'detailModel>/automationNames'
+                                            }">
+                                            <core:Item key="{detailModel>}" text="{detailModel>}" />
+                                        </MultiComboBox>
+                                    </fb:control>
+                                </fb:FilterGroupItem>
+                                    <fb:FilterGroupItem name="Process Name" label="Process Name" groupName="Group1" visibleInFilterBar="true">
+                                    <fb:control>
+                                        <MultiComboBox 
+                                            id="processNamesComboBox"
+                                            showSelectAll="true"
+                                            placeholder="Select any Process "
+                                            selectionChange=".onProcessSelectionChange"
+                                            items="{
+                                                path: 'detailModel>/processNames'
+                                            }">
+                                            <core:Item key="{detailModel>}" text="{detailModel>}" />
+                                        </MultiComboBox>
+                                    </fb:control>
+                                </fb:FilterGroupItem>
+                                <!-- <fb:FilterGroupItem name="Tenants" label="Tenants" groupName="Group1" visibleInFilterBar="true">
+                                    <fb:control>
+                                        <MultiComboBox 
+                                            id="tenantNamesComboBox"
+                                            showSelectAll="true"
+                                            placeholder="Select any Tenant "
+                                            selectionChange=".onTenantSelectionChange"
+                                            items="{
+                                                path: 'detailModel>/tenantsNames'
+                                            }">
+                                            <core:Item key="{detailModel>}" text="{detailModel>}" />
+                                        </MultiComboBox>
+                                    </fb:control>
+                                </fb:FilterGroupItem> -->
+                        </fb:filterGroupItems>
+                    </fb:FilterBar>
+                </VBox>
+            </f:DynamicPageHeader>
+        </f:header>
+        <f:content>
+            <VBox>
+                     <!-- Chart -->
+                <!-- <viz:VizFrame id="idVizFrame" height="400px" width="100%" vizType="column">
+                    <viz:dataset>
+                        <viz.data:FlattenedDataset data="{detailModel>/data}">
+                            <viz.data:dimensions>
+                                <viz.data:DimensionDefinition name="DateTime" value="{detailModel>formattedStartTime}" />
+                            </viz.data:dimensions>
+                            <viz.data:measures>
+                                <viz.data:MeasureDefinition name="Duration" value="{detailModel>duration}" />
+                            </viz.data:measures>
+                        </viz.data:FlattenedDataset>
+                    </viz:dataset>
+                    <viz:feeds>
+                        <viz.feeds:FeedItem uid="valueAxis" type="Measure" values="Duration" />
+                        <viz.feeds:FeedItem uid="categoryAxis" type="Dimension" values="DateTime" />
+                    </viz:feeds>
+                </viz:VizFrame> -->
+
+               <Table id="idTable" 
+                      items="{path: 'detailModel>/data'}" 
+                      sticky="ColumnHeaders,HeaderToolbar" 
+                      width="100%" 
+                      class="detailsTable" 
+                      alternateRowColors="true" 
+                      inset="false" 
+                      growing="true"
+                      growingThreshold="8">
+                    <headerToolbar>
+                        <Toolbar>
+                            <Title text="Jobs ({detailModel>/itemCount})" />
+                            <ToolbarSpacer />
+                            <Button 
+                                icon="sap-icon://refresh" 
+                                tooltip="Refresh"
+                                press=".onRefresh" />
+                            <Button 
+                                icon="sap-icon://download" 
+                                tooltip="Download"
+                                press=".onDownload" />
+                        </Toolbar>
+                    </headerToolbar>
+                    <columns>
+                        <Column width="50px">
+                            <Text text="Type" />
+                        </Column>
+                        <Column>
+                            <Text text="Automation Name" />
+                        </Column>
+                        <Column>
+                            <Text text="Process Name" />
+                        </Column>
+                        <Column>
+                            <Text text="Start Time" />
+                        </Column>
+                        <Column>
+                            <Text text="Duration" />
+                        </Column>
+                        <Column>
+                            <Text text="Error Message" />
+                        </Column>
+                        <Column width="150px">
+                            <Text text="Status" />
+                        </Column>
+                    </columns>
+                    <items>
+                        <ColumnListItem>
+                            <cells>
+                                <Avatar backgroundColor="{= ${detailModel>status} === 'Completed' ? 'Accent8' : 
+                                                            ${detailModel>status} === 'In Progress' ? 'Accent6' : 
+                                                            ${detailModel>status} === 'Failed' ? 'Accent2' : 'Accent1' }" 
+                                        src="sap-icon://tree" displaySize="XS" displayShape="Square" />
+                                <Text text="{detailModel>automationName}" />
+                                <Text text="{detailModel>processSubjectName}" />
+                                <Text text="{detailModel>formattedStartTime}" />
+                                <Text text="{detailModel>duration}" />
+                                <Text text="{detailModel>errorMessage}" />
+                                <ObjectStatus
+                                    inverted="true"
+                                    state="{= ${detailModel>status} === 'Completed' ? 'Success' : 
+                                            ${detailModel>status} === 'In Progress' ? 'Information' : 
+                                            ${detailModel>status} === 'Failed' ? 'Error' : 'None' }"
+                                    text="{detailModel>status}"
+                                    class="textStatusDetail"
+                                />
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+            </VBox>
+        </f:content>
+    </f:DynamicPage>
+</mvc:View>

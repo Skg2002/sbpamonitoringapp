@@ -100,123 +100,6 @@
 
 
 
-.indications {
-background-color: #fff;
-padding: 10px;
-color: white; 
-width:24vw !important;
-height: 925px !important;
-}
-.indication {
-  background-color: #fff;
-  padding: 10px;
-  color: white; 
-  width:66vw !important;
-  margin-left: 10px;
-}
-@media (max-width: 600px) {
-  .indications {
-      font-size: 14px; 
-      width:93vw!important;
-  }
-  .indication {
-    width:93vw !important;
-  }
-}
-
-.indicatorSection{
-  background-color: rgb(206, 225, 255);
-  padding: 10px 10px 10px 10px !important;
-  font-weight: 600 !important;
-  font-size: 20px !important;
-  width:23vw !important; 
-}
-.textStatus{
-  background-color:  rgb(206, 212, 255);
-  padding: 10px 10px 10px 10px !important;
-  font-weight: 600 !important;
-  font-size: 20px !important;
-  width:71vw !important; 
-}
-.responseText{
-  background-color: rgb(214, 206, 255);
-  padding: 10px 10px 10px 10px !important;
-  font-weight: 600 !important;
-  font-size: 20px !important;
-  width:71vw !important;
-}
-.requestText{
-  text-align: center !important;
-   margin-top: 60px !important;
-   width:370px !important ;
-   font-size: 20px !important;
-   font-weight: 700 !important;
-
-}
-.errorText{
-  margin-top: 150px !important;
-  margin-left: 57px !important;
-  font-size: 20px !important;
-  font-weight: 700 !important;
-
-}
-.errorcode{
-  margin-top: 120px !important;
-  font-size: 20px !important;
-}
-.tableText{
-  margin-left: 57px !important;
-  font-size: 20px !important;
-  font-weight: 700 !important;
-}
-.responsetimeText{
-  text-align: center !important;
-  margin-top: 105px !important;
-  font-size: 20px !important;
-  width: 250px !important;
-  font-weight: 700 !important;
-}
-.failedText{
-  text-align: center !important;
-  margin-top: 60px !important;
-  font-size: 20px !important;
-  width: 250px !important;
-  font-weight: 700 !important;
-}
-.countrequest{
-  /* margin-left: 170px; */
-  text-align: center !important;
-  font-size: 40px !important;
-  font-weight: 700 !important;
-  width: 300px !important;
-  color: crimson !important;
-}
-.countresponse{
-  /* margin-left: 110px; */
-  text-align: center !important;
-  font-size: 40px !important;
-  font-weight: 700 !important;
-  width: 320px !important;
-  color: green !important;
-}
-.failedcount{
-  text-align: center !important;
-  font-size: 40px !important;
-  font-weight: 700 !important;
-  width: 260px !important;
-  color: green !important;
-}
-
-.norespnse {
-  text-align: center;
-  margin-top: 80px;
-  margin-left: 120px;
-}
-
-
-
-
-
 
 
 
@@ -251,4 +134,224 @@ height: 925px !important;
 
 .flip-back {
     transform: rotateY(180deg);
+}
+
+/* Minimalistic overlay button */
+.overlayButton {
+  position: absolute;
+  top: 10px; /* Distance from the top of the chart */
+  left: 10px; /* Align the button to the left */
+  z-index: 10;
+  width: 36px; /* Circular size */
+  height: 36px;
+  border: none; /* Remove the button's border */
+  border-radius: 50%; /* Circular button */
+  background-color: #ffffff; /* Clean white background */
+  color: #0072c6; /* SAP primary blue for the icon */
+  display: flex; /* Center the icon */
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  outline: none; /* Remove default focus outline */
+  box-shadow: none; /* No shadow for a flat design */
+  transition: background-color 0.2s, transform 0.2s; /* Smooth hover effect */
+}
+
+/* Hover effect */
+.overlayButton:hover {
+  background-color: #f3f3f3; /* Slightly darker background */
+  transform: scale(1.05); /* Subtle zoom effect */
+}
+
+/* Focus effect */
+.overlayButton:focus {
+  outline: none; /* Remove focus outline */
+  box-shadow: none; /* No shadow on focus */
+}
+
+.chartCard {
+  border-radius: 12px;
+  background: linear-gradient(145deg, #f0f0f0, #e0e0e0); /* Subtle gradient for 3D feel */
+  box-shadow: inset 0px 2px 6px rgba(255, 255, 255, 0.2), 0px 4px 10px rgba(0, 0, 0, 0.1); /* Inner and outer shadows */
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.chartCard:hover {
+  box-shadow: inset 0px 3px 8px rgba(255, 255, 255, 0.3), 0px 8px 15px rgba(0, 0, 0, 0.2); /* Slightly stronger shadow on hover */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.indications {
+  background-color: #fff;
+  padding: 10px;
+  color: white; 
+  width:24vw !important;
+  height: 925px !important;
+}
+.indication {
+    background-color: #fff;
+    padding: 10px;
+    color: white; 
+    width:100% !important;
+    margin-left: 10px;
+  }
+@media (max-width: 600px) {
+    .indications {
+        font-size: 14px; 
+        width:93vw!important;
+    }
+    .indication {
+      width:93vw !important;
+    }
+}
+
+  .indicatorSection{
+    background-color: rgb(206, 225, 255);
+    padding: 10px 10px 10px 10px !important;
+    font-weight: 600 !important;
+    font-size: 20px !important;
+    width:23vw !important; 
+  }
+  .textStatus{
+    background-color:  rgb(206, 212, 255);
+    padding: 10px 10px 10px 10px !important;
+    font-weight: 600 !important;
+    font-size: 20px !important;
+    width:45vw !important; 
+  }
+  .responseText{
+    background-color: rgb(214, 206, 255);
+    padding: 10px 10px 10px 10px !important;
+    font-weight: 600 !important;
+    font-size: 20px !important;
+    width:45vw !important;
+  }
+  .requestText{
+    text-align: center !important;
+     margin-top: 40px !important;
+     width:370px !important ;
+     font-size: 20px !important;
+     font-weight: 700 !important;
+
+  }
+  .errorText{
+    margin-top: 40px !important;
+    margin-right: 80px !important;
+    font-size: 20px !important;
+    font-weight: 700 !important;
+    text-align: center !important;
+
+  }
+  .errorcode{
+    margin-top: 120px !important;
+    font-size: 20px !important;
+  }
+  .tableText{
+    margin-left: 57px !important;
+    font-size: 20px !important;
+    font-weight: 700 !important;
+  }
+  .responsetimeText{
+    text-align: center !important;
+    margin-top: 40px !important;
+    font-size: 20px !important;
+    width: 250px !important;
+    font-weight: 700 !important;
+    margin-left: 15px !important;
+  }
+  .automationCount{
+    text-align: center !important;
+    margin-top: 40px !important;
+    font-size: 20px !important;
+    width: 285px !important;
+    font-weight: 700 !important;
+    margin-left: 15px !important;
+  
+  }
+  .failedText{
+    text-align: center !important;
+    margin-top: 40px !important;
+    font-size: 20px !important;
+    width: 250px !important;
+    font-weight: 700 !important;
+  }
+  .countrequest{
+    /* margin-left: 170px; */
+    text-align: center !important;
+    font-size: 95px !important;
+    font-weight: 700 !important;
+    width: 300px !important;
+    color: #dc143c !important;
+  }
+  .countresponse{
+    /* margin-left: 110px; */
+    text-align: center !important;
+    font-size: 50px !important;
+    font-weight: 700 !important;
+    width: 320px !important;
+    color: #1c9d1c !important;
+  }
+  .countresponsetime{
+    text-align: center !important;
+    font-size: 50px !important;
+    font-weight: 700 !important;
+    width: 320px !important;
+    color: #5e675e !important;
+  }
+  .failedcount{
+    text-align: center !important;
+    font-size: 50px !important;
+    font-weight: 700 !important;
+    width: 260px !important;
+    color: rgb(236, 1, 1) !important;
+  }
+  .countrunning{
+    text-align: center !important;
+    font-size: 50px !important;
+    font-weight: 700 !important;
+    width: 320px !important;
+    color: #0064d9 !important;
+  }
+  
+ .norespnse {
+    text-align: center;
+    margin-top: 80px;
+    margin-left: 120px;
+}
+.statusCompleted {
+  border: 2px solid rgb(124, 194, 124) !important;
+  padding: 4px !important;
+  font-size: 12px !important;
+}
+
+.statusInProgress {
+  border: 2px solid rgb(127, 163, 176) !important;
+  padding: 4px !important;
+  font-size: 12px !important;
+}
+.textStatusDetail{
+  width: 5rem !important;
+  text-align: center !important;
+
 }

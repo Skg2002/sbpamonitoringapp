@@ -114,6 +114,13 @@
           "target": [
             "TargetSelectedProcessDetailsview"
           ]
+        },
+        {
+          "pattern": "Automationdetail/{automationPath}?tenant={tenant}",
+          "name": "Automationdetail",
+          "target": [
+            "Automationdetail"
+          ]
         }
       ],
       "targets": {
@@ -130,6 +137,13 @@
           "clearControlAggregation": false,
           "viewId": "selectedprocessdetails",
           "viewName": "selectedprocessdetails"
+        },
+        "Automationdetail": {
+          "viewType": "XML",
+          "transition": "slide",
+          "clearControlAggregation": false,
+          "viewId": "Automationdetail",
+          "viewName": "Automationdetail"
         }
       }
     },

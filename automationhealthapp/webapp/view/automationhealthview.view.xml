@@ -108,7 +108,7 @@
                 <ScrollContainer horizontal="false" vertical="true" height="100%">
                     <IconTabBar select=".onIconTabFilterSelect">
                         <items>
-                            <IconTabFilter text="Process Overview" key="overview" icon="sap-icon://overview-chart">
+                            <IconTabFilter text="Process Overview" design="Horizontal" key="overview" icon="sap-icon://overview-chart">
                                 <VBox width="100%" justifyContent="SpaceAround">
                                     <!-- Overview Counts -->
                                     <HBox justifyContent="SpaceAround" width="100%">
@@ -168,9 +168,16 @@
 <HBox justifyContent="SpaceAround" width="100%">
     <!-- Flip Container for Line Chart and Bar Chart -->
     <VBox id="flipContainer" class="flip-container" width="45%">
+
+
+    <!-- <f:Card   width="40vw" id="flipContainer" class="flip-container" height="400px">
+                                <f:content> -->
         <VBox class="flipper">
             <!-- Front Side (Line Chart) -->
             <VBox id="lineChartContainer" class="flip-front" visible="true" width="100%">
+            <f:Card width="100%" height="100%" class="chartCard">
+                
+                <f:content>
                 <viz:VizFrame id="idLineChart" vizType="line" height="400px" width="100%" selectData="onSelectLineChart" legendVisible="false">
                     <viz:dataset>
                         <viz.data:FlattenedDataset data="{lineModel>/LineData}">
@@ -187,11 +194,17 @@
                         <viz.feeds:FeedItem uid="valueAxis" type="Measure" values="Process Count"/>
                     </viz:feeds>
                 </viz:VizFrame>
+                </f:content>
+            </f:Card>
             </VBox>
+           
 
             <!-- Back Side (Bar Chart) -->
             <VBox id="barChartContainer" class="flip-back" visible="false" width="100%">
-                <Button icon="sap-icon://nav-back" press="onBackToLineChart" id="bck2line" />
+                <!-- <Button icon="sap-icon://nav-back" press="onBackToLineChart" id="bck2line" class="overlayButton"/> -->
+                <Button icon="sap-icon://nav-back" press="onBackToLineChart" id="bck2line" class="overlayButton"/>
+                <f:Card width="100%" height="100%" class="chartCard">
+                <f:content>
                 <viz:VizFrame id="idBarChart" height="400px" width="100%" selectData="onSelectBarChart" legendVisible="false">
                     <viz:dataset>
                         <viz.data:FlattenedDataset data="{barModel>/BarData}">
@@ -208,200 +221,233 @@
                         <viz.feeds:FeedItem uid="valueAxis" type="Measure" values="Value"/>
                     </viz:feeds>
                 </viz:VizFrame>
+                 </f:content>
+            </f:Card>
             </VBox>
         </VBox>
+         <!-- </f:content>
+            </f:Card> -->
     </VBox>
     
-     <VBox id="flippContainer" class="flip-container" width="45%">
-    <!-- Ensure Pie Chart and other content stays in place when switching tabs -->
+ <VBox id="flippContainer" class="flip-container" width="45%">
     <VBox class="flipper">
-     <VBox id="pieChartContainer" class="flip-front" visible="true" width="100%">
-        <viz:VizFrame id="idVizFramePie" height="400px" width="100%" selectData="onPieSelect" uiConfig="{applicationSet:'fiori'}" visible="true" vizType="pie" >
-            <viz:dataset>
-                <viz.data:FlattenedDataset data="{pieModel>/PieData}">
-                    <viz.data:dimensions>
-                        <viz.data:DimensionDefinition name="ProcessName" value="{pieModel>Status}"/>
-                    </viz.data:dimensions>
-                    <viz.data:measures>
-                        <viz.data:MeasureDefinition name="Error Count" value="{pieModel>Count}"/>
-                    </viz.data:measures>
-                </viz.data:FlattenedDataset>
-            </viz:dataset>
-            <viz:feeds>
-                <viz.feeds:FeedItem uid="size" type="Measure" values="Error Count"/>
-                <viz.feeds:FeedItem uid="color" type="Dimension" values="ProcessName"/>
-            </viz:feeds>
-        </viz:VizFrame>
-    </VBox>
-
-     <VBox id="donutChartContainer" class="flip-back" visible="false" width="100%" >
-                <Button icon="sap-icon://nav-back" press="onBackToPieChart" />
-                <viz:VizFrame id="idDonutChart" height="400px" width="100%" vizType='donut'>
-                    <viz:dataset>
-                        <viz.data:FlattenedDataset data="{donutModel>/DonutData}">
-                            <viz.data:dimensions>
-                                <viz.data:DimensionDefinition name="Category" value="{donutModel>Category}"/>
-                            </viz.data:dimensions>
-                            <viz.data:measures>
-                                <viz.data:MeasureDefinition name="Value" value="{donutModel>Value}"/>
-                            </viz.data:measures>
-                        </viz.data:FlattenedDataset>
-                    </viz:dataset>
-                    <viz:feeds>
-                        <viz.feeds:FeedItem uid="size" type="Measure" values="Value"/>
-            <viz.feeds:FeedItem uid="color" type="Dimension" values="Category"/>
-                    </viz:feeds>
-                </viz:VizFrame>
+        <!-- Front: Pie Chart Card -->
+        <VBox id="pieChartContainer" class="flip-front" visible="true" width="100%">
+            <f:Card width="100%" height="100%" class="chartCard">
+                
+                <f:content>
+                    <viz:VizFrame id="idVizFramePie" height="400px" width="100%" selectData="onPieSelect" uiConfig="{applicationSet:'fiori'}" vizType="pie">
+                        <viz:dataset>
+                            <viz.data:FlattenedDataset data="{pieModel>/PieData}">
+                                <viz.data:dimensions>
+                                    <viz.data:DimensionDefinition name="ProcessName" value="{pieModel>Status}" />
+                                </viz.data:dimensions>
+                                <viz.data:measures>
+                                    <viz.data:MeasureDefinition name="Error Count" value="{pieModel>Count}" />
+                                </viz.data:measures>
+                            </viz.data:FlattenedDataset>
+                        </viz:dataset>
+                        <viz:feeds>
+                            <viz.feeds:FeedItem uid="size" type="Measure" values="Error Count" />
+                            <viz.feeds:FeedItem uid="color" type="Dimension" values="ProcessName" />
+                        </viz:feeds>
+                    </viz:VizFrame>
+                </f:content>
+            </f:Card>
         </VBox>
-         </VBox>
-          </VBox>
+
+        <!-- Back: Donut Chart Card -->
+        <VBox id="donutChartContainer" class="flip-back" visible="false" width="100%">
+         <Button icon="sap-icon://nav-back" press="onBackToPieChart" class="overlayButton" />
+            <f:Card width="100%" height="100%" class="chartCard">
+                <f:content>
+                   
+                    <viz:VizFrame id="idDonutChart" height="400px" width="100%" vizType="donut">
+                        <viz:dataset>
+                            <viz.data:FlattenedDataset data="{donutModel>/DonutData}">
+                                <viz.data:dimensions>
+                                    <viz.data:DimensionDefinition name="Category" value="{donutModel>Category}" />
+                                </viz.data:dimensions>
+                                <viz.data:measures>
+                                    <viz.data:MeasureDefinition name="Value" value="{donutModel>Value}" />
+                                </viz.data:measures>
+                            </viz.data:FlattenedDataset>
+                        </viz:dataset>
+                        <viz:feeds>
+                            <viz.feeds:FeedItem uid="size" type="Measure" values="Value" />
+                            <viz.feeds:FeedItem uid="color" type="Dimension" values="Category" />
+                        </viz:feeds>
+                    </viz:VizFrame>
+                </f:content>
+            </f:Card>
+        </VBox>
+    </VBox>
+</VBox>
+
 </HBox>
 
 </VBox>
 
                             </IconTabFilter>
 
-                            <IconTabFilter text="Error Monitor" key="signals" icon="sap-icon://activity-items">
-                                   
-      <VBox>
+                            <IconTabFilter key="tab1" design="Horizontal" text="Automation Overview" icon="sap-icon://tree">
+                    <VBox>
 
-                        <!-- Top Controls (MultiInput and DateRangeSelection) -->
-                        <!-- <HBox class="ResponsiveGridLayout" justifyContent="Center">
-                            
-                            <DateRangeSelection id="dateRangeSelectorId"
+                        <HBox class="ResponsiveGridLayout" justifyContent="Center">
+                            <!-- <MultiInput width="100%" id="multiInput"
+                                        value=""
+                                        suggestionItems="{
+                                            path: 'wfModel>/Destinations',
+                                            sorter: { path: 'wfModel>display_Name' }
+                                        }"
+                                        valueHelpRequest="handleValueHelp"
+                                        tokenUpdate="onTokenUpdate">
+                                <core:Item key="{wfModel>dest_name}" text="{wfModel>display_Name}" />
+                            </MultiInput> -->
+                            <!-- <DateRangeSelection id="dateRangeSelectorId"
                                                 displayFormat="long" 
                                                 change="onDateRangeChange" 
                                                 valueFormat="yyyy-MM-dd"
                                                 dateValue="{dateModel>/startDate}"
-                                                secondDateValue="{dateModel>/endDate}" width="20vw"/>
-                        </HBox> -->
-
-                        <!-- Grid Layout for Indicators and Charts -->
-                        <!-- <layout:Grid width="100%" hSpacing="1" vSpacing="1" visible="true"> -->
-                        <HBox backgroundDesign="Transparent">
-
-                            <!-- Left Column Content -->
-                            
-                                <VBox layoutData="layout:GridData" span="L3 M3 S12" class="indications">
-                                    <Text text="Error Code Indicators" class="sapUiSmallMarginBottom sapUiLargeFont indicatorSection"/>
-                                    <Text text="Failed Service Requests" class="sapUiTinyMarginBottom requestText"/>
-                                    <Text text="{errorCountModel>/totalCount}" class="sapUiTinyMarginBottom countrequest"/>
-
-                                    <!-- Status Code Table -->
-                                    <VBox class="errorcode">
-                                        <Text text="Status Code Distribution" class="sapUiTinyMarginBottom tableText"/>
-                                        <Table id="statusTable" items="{path: 'errorCountModel>/statusCounts'}" growing="true">
-                                            <columns>
-                                                <Column><Text text="Status Code" /></Column>
-                                                <Column><Text text="Count" /></Column>
-                                            </columns>
-                                            <items>
-                                                <ColumnListItem type="Active">
-                                                    <cells>
-                                                        <Text text="{errorCountModel>statusCode}"/>
-                                                        <Text text="{errorCountModel>count}" />
-                                                    </cells>
-                                                </ColumnListItem>
-                                            </items>
-                                        </Table>
+                                                secondDateValue="{dateModel>/endDate}" width="20vw"/> -->
+                        </HBox>
+                                                <!-- <layout:Grid width="100%" hSpacing="1" vSpacing="1" visible="true"> -->
+                        <VBox backgroundDesign="Transparent" class="sapUiTinyMarginTopBottom">
+                                <HBox justifyContent="SpaceBetween" class="sapUiSmallMarginBottom" alignContent="Center">
+                                    <VBox alignContent="Center">
+                                        <Text text="Total Failed Automations" class="sapUiTinyMarginBottom failedText"/>
+                                        <Text text="{automationDetailsModel>/totalFailedCount}" class="sapUiTinyMarginBottom failedcount"/>
                                     </VBox>
+                                    <VBox alignContent="Center">
+                                        <Text text="Total Completed Automations" class="sapUiTinyMarginBottom automationCount"/>
+                                        <Text text="{automationDetailsModel>/completedCount}" class="sapUiTinyMarginBottom countresponse"/>
+                                    </VBox>
+                                    <VBox alignContent="Center">
+                                        <Text text="Total Execution Time(in s)" class="sapUiTinyMarginBottom responsetimeText"/>
+                                        <Text text="{automationDetailsModel>/totalExecutionTime}" class="sapUiTinyMarginBottom countresponsetime"/>
+                                    </VBox>
+                                    <VBox alignContent="Center">
+                                        <Text text="Total Running Automations" class="sapUiTinyMarginBottom automationCount"/>
+                                        <Text text="{automationDetailsModel>/runningCount}" class="sapUiTinyMarginBottom countrunning"/>
+                                    </VBox>
+                                </HBox>
 
-                                    <!-- Error Code Distribution Pie Chart -->
-                                    <Text text="Error Code Distribution" class="sapUiTinyMarginBottom errorText"/>
-                                    <viz:VizFrame id="idVizFrames" vizType="pie" height="300px" width="300px">
-                                        <viz:dataset>
-                                            <viz.data:FlattenedDataset data="{errorCountModel>/statusCounts}">
-                                                <viz.data:dimensions>
-                                                    <viz.data:DimensionDefinition name="Status Code" value="{errorCountModel>statusCode}" />
-                                                </viz.data:dimensions>
-                                                <viz.data:measures>
-                                                    <viz.data:MeasureDefinition name="Count" value="{errorCountModel>count}" />
+                                <HBox justifyContent="SpaceBetween" alignContent="Stretch">
+
+                            <f:Card   width="27vw" class="sapUiMediumMarginBottom" height="400px">
+                                <f:content>
+                                    <VBox>
+                                        <!-- <Text text="Failed Automations Over Time" class="sapUiSmallMarginBottom sapUiLargeFont textStatus"/> -->
+                                        <viz:VizFrame id="lineChart" vizType="stacked_column" height="370px" width="26vw">
+                                            <viz:dataset>
+                                                <viz.data:FlattenedDataset data="{automationDetailsModel>/failedCountsByTenant}">
+                                                    <viz.data:dimensions>
+                                                        <viz.data:DimensionDefinition name="Execution Date" value="{automationDetailsModel>executionDate}" />
+                                                        <viz.data:DimensionDefinition name="Tenant" value="{automationDetailsModel>tenant}" />
+                                                    </viz.data:dimensions>
+                                                    <viz.data:measures>
+                                                        <viz.data:MeasureDefinition name="FailedCount" value="{automationDetailsModel>failedCount}" />
+                                                    </viz.data:measures>
+                                                </viz.data:FlattenedDataset>
+                                            </viz:dataset>
+                                            <viz:feeds>
+                                                <viz.feeds:FeedItem uid="valueAxis" type="Measure" values="FailedCount" />
+                                                <viz.feeds:FeedItem uid="categoryAxis" type="Dimension" values="Execution Date" />
+                                                <viz.feeds:FeedItem uid="color" type="Dimension" values="Tenant" />
+                                            </viz:feeds>
+                                        </viz:VizFrame>
+                                    </VBox>
+                                </f:content>
+                            </f:Card>
+                            <f:Card   width="27vw" height="400px">
+                                <f:content>
+                                    <VBox >
+                                        <!-- <Text text="Executed Automations Analysis" class="sapUiSmallMarginBottom sapUiLargeFont responseText"/> -->
+                                        <viz:VizFrame id="maxResponseTimeChart" height="370px" width="26vw" vizType="stacked_column">
+                                            <viz:dataset>
+                                                <viz.data:FlattenedDataset data="{automationDetailsModel>/flattenedChartData}">
+                                                   <viz.data:measures>
+                                                    <viz.data:MeasureDefinition
+                                                        name="Completed Count"
+                                                        value="{automationDetailsModel>completedCount}" />
+                                                    <viz.data:MeasureDefinition
+                                                        name="Status"
+                                                        value="{automationDetailsModel>status}" />
                                                 </viz.data:measures>
-                                            </viz.data:FlattenedDataset>
-                                        </viz:dataset>
-                                        <viz:feeds>
-                                            <viz.feeds:FeedItem uid="size" type="Measure" values="Count" />
-                                            <viz.feeds:FeedItem uid="color" type="Dimension" values="Status Code" />
-                                        </viz:feeds>
-                                    </viz:VizFrame>
-                                </VBox>
-                          
-
-                            <!-- Right Column Content -->
-                            
-                                <VBox layoutData="layout:GridData" span="L6 M6 S12" class="indication">
-
-                                    <!-- Failed Automations and Failed Status Chart -->
-                                    <Text text="Failed Automations" class="sapUiSmallMarginBottom sapUiLargeFont textStatus"/>
-                                    <layout:Grid layoutData="layout:GridData" span="L12 M12 S12" hSpacing="1" vSpacing="1">
-                                        <layout:content>
-                                            <HBox>
-                                                <VBox alignContent="Center">
-                                                    <Text text="Total Failed Automations" class="sapUiTinyMarginBottom failedText"/>
-                                                    <Text text="{automationDetailsModel>/totalFailedCount}" class="sapUiTinyMarginBottom failedcount"/>
-                                                </VBox>
-                                                <VBox>
-                                                    <viz:VizFrame id="lineChart" vizType="line" height="300px" width="47vw" selectData="selected">
-                                                        <viz:dataset>
-                                                            <viz.data:FlattenedDataset data="{automationDetailsModel>/failedCounts}">
-                                                                <viz.data:dimensions>
-                                                                    <viz.data:DimensionDefinition axis="1" name="Start Time" value="{automationDetailsModel>startTime}" />
-                                                                </viz.data:dimensions>
-                                                                <viz.data:measures>
-                                                                    <viz.data:MeasureDefinition name="Failed Count" value="{automationDetailsModel>count}" />
-                                                                </viz.data:measures>
-                                                            </viz.data:FlattenedDataset>
-                                                        </viz:dataset>
-                                                        <viz:feeds>
-                                                            <viz.feeds:FeedItem uid="valueAxis" type="Measure" values="Failed Count" />
-                                                            <viz.feeds:FeedItem uid="categoryAxis" type="Dimension" values="Start Time" />
-                                                        </viz:feeds>
-                                                    </viz:VizFrame>
-                                                </VBox>
-                                            </HBox>
-                                        </layout:content>
-                                    </layout:Grid>
-
-                                    <!-- Automation Execution Times -->
-                                    <VBox layoutData="layout:GridData" span="L12 M12 S12">
-                                        <Text text="Automation Execution Times" class="sapUiSmallMarginBottom sapUiLargeFont responseText"/>
-                                        <layout:Grid layoutData="layout:GridData" span="L12 M12 S12" hSpacing="1" vSpacing="1">
-                                            <layout:content>
-                                                <VBox alignContent="Center">
-                                                    <Text text="Max Response Time" class="sapUiTinyMarginBottom responsetimeText"/>
-                                                    <Text text="{automationDetailsModel>/totalExecutionTime} s" class="sapUiTinyMarginBottom countresponse"/>
-                                                </VBox>
-                                                <VBox>
-                                                    <viz:VizFrame id="maxResponseTimeChart" height="450px" width="48vw">
-                                                        <viz:dataset>
-                                                            <viz.data:FlattenedDataset data="{automationDetailsModel>/completedStatusData}">
-                                                                <viz.data:measures>
-                                                                    <viz.data:MeasureDefinition name="Execution Time(sec)" value="{automationDetailsModel>duration}" />
-                                                                    <viz.data:MeasureDefinition name="Color" value="{automationDetailsModel>color}" />
-                                                                </viz.data:measures>
-                                                                <viz.data:dimensions>
-                                                                    <viz.data:DimensionDefinition name="DateTime" value="{automationDetailsModel>executionDate}" />
-                                                                </viz.data:dimensions>        
-                                                            </viz.data:FlattenedDataset>
-                                                        </viz:dataset>
-                                                        <viz:feeds>
-                                                            <viz.feeds:FeedItem uid="categoryAxis" type="Dimension" values="DateTime" />
-                                                            <viz.feeds:FeedItem uid="valueAxis" type="Measure" values="Execution Time(sec)" />
-                                                            <viz.feeds:FeedItem uid="colorAxis" type="Measure" values="Color" />
-                                                        </viz:feeds>
-                                                        <viz:dependents>
-                                                            <viz:Popover id="idPopOver"/>
-                                                        </viz:dependents>
-                                                    </viz:VizFrame>
-                                                </VBox>
-                                            </layout:content>
-                                        </layout:Grid>
+                                                    <viz.data:dimensions>
+                                                    <viz.data:DimensionDefinition
+                                                        name="Execution Date"
+                                                        value="{automationDetailsModel>executionDate}" />
+                                                    <viz.data:DimensionDefinition
+                                                        name="Tenant"
+                                                        value="{automationDetailsModel>tenant}" />
+                                                </viz.data:dimensions>       
+                                                </viz.data:FlattenedDataset>
+                                            </viz:dataset>
+                                            <viz:feeds>
+                                                <viz.feeds:FeedItem
+                                                        uid="valueAxis"
+                                                        type="Measure"
+                                                        values="Completed Count" />
+                                                    <viz.feeds:FeedItem
+                                                        uid="status"
+                                                        type="Measure"
+                                                        values="Status" />
+                                                    <viz.feeds:FeedItem
+                                                        uid="categoryAxis"
+                                                        type="Dimension"
+                                                        values="Execution Date" />
+                                                    <viz.feeds:FeedItem
+                                                        uid="color"
+                                                        type="Dimension"
+                                                        values="Tenant" />        
+                                            </viz:feeds>
+                                        </viz:VizFrame>
                                     </VBox>
-
-                                </VBox>
-                            
-</HBox>
-                        <!-- </layout:Grid> -->
+                                </f:content>
+                            </f:Card>
+                             <f:Card  width="27vw" height="400px">
+                                <f:content>
+                                    <VBox  >
+                                        <!-- <Text text="On Going Automations Analysis" class="sapUiSmallMarginBottom sapUiLargeFont responseText"/> -->
+                                        <viz:VizFrame id="RunningChart" height="370px" width="26vw" vizType='stacked_column'>
+                                            <viz:dataset>
+                                                <viz.data:FlattenedDataset data="{automationDetailsModel>/flattenedRunningData}">
+                                                   <viz.data:measures>
+                                                    <viz.data:MeasureDefinition
+                                                        name="RunningCount"
+                                                        value="{automationDetailsModel>runningCount}" />
+                                                </viz.data:measures>
+                                                    <viz.data:dimensions>
+                                                    <viz.data:DimensionDefinition
+                                                        name="Execution Date"
+                                                        value="{automationDetailsModel>executionDate}" />
+                                                    <viz.data:DimensionDefinition
+                                                        name="Tenant"
+                                                        value="{automationDetailsModel>tenant}" />
+                                                </viz.data:dimensions>       
+                                                </viz.data:FlattenedDataset>
+                                            </viz:dataset>
+                                            <viz:feeds>
+                                                <viz.feeds:FeedItem
+                                                        uid="valueAxis"
+                                                        type="Measure"
+                                                        values="RunningCount" />
+                                                    <viz.feeds:FeedItem
+                                                        uid="categoryAxis"
+                                                        type="Dimension"
+                                                        values="Execution Date" />
+                                                    <viz.feeds:FeedItem
+                                                        uid="color"
+                                                        type="Dimension"
+                                                        values="Tenant" />
+                                            </viz:feeds>
+                                        </viz:VizFrame>
+                                    </VBox>
+                                </f:content>
+                            </f:Card>
+                            </HBox>
+                        </VBox>
                     </VBox>
                 </IconTabFilter>
 

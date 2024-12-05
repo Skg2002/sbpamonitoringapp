@@ -13,6 +13,9 @@ sap.ui.define([
 
     return Controller.extend("automationhealthapp.controller.automationhealthview", {
         onInit: function () {
+            
+            // sap.ui.core.routing.Router.getRouter("app").clear();
+
 
             var oBarModel = new sap.ui.model.json.JSONModel();
             this.getView().setModel(oBarModel, "barModel");
@@ -20,15 +23,13 @@ sap.ui.define([
             var oDonutModel = new sap.ui.model.json.JSONModel();
             this.getView().setModel(oDonutModel, "donutModel");
 
-            var automationDetailsModel = new sap.ui.model.json.JSONModel({
-                instances: [],
-                failedCounts: [],
-                completedStatusData:[],
-                totalFailedCount: 0, 
-                totalExecutionTime: 0
-            });
+            var oRouter = this.getOwnerComponent().getRouter();
+            oRouter.getRoute("Routeautomationhealthview").attachMatched(this._onRouteMatched, this);
+
+            window.addEventListener("popstate", this._onBrowserBack.bind(this));
+
         
-        this.getView().setModel(automationDetailsModel, "automationDetailsModel");
+        
         var oExecutionModel = new sap.ui.model.json.JSONModel({ totalExecutionTime: 0 }); // Initialize with 0
             this.getView().setModel(oExecutionModel, "executionModel");
 
@@ -46,9 +47,9 @@ sap.ui.define([
             
             var oVizLineFrame = this.getView().byId("idLineChart");
             var oVizPieFrame = this.getView().byId("idVizFramePie");
-            var oVizAutomation =this.getView().byId("maxResponseTimeChart");
-            var ovizErrorLine=this.getView().byId("lineChart");
-            var ovizErrorCode=this.getView().byId("idVizFrames");
+            // var oVizAutomation =this.getView().byId("maxResponseTimeChart");
+            // var ovizErrorLine=this.getView().byId("lineChart");
+            // var ovizErrorCode=this.getView().byId("idVizFrames");
             var oVizBarFrame = this.getView().byId("idBarChart");
            
 
@@ -59,23 +60,23 @@ sap.ui.define([
                     text: "Process Count w.r.t Time"
                 }
             });
-            oVizAutomation.setVizProperties({
-                title: {
-                    visible: true,
-                    text: "Execution Time Over Date"
-                }
-            });
-            ovizErrorLine.setVizProperties({
-                title: {
-                    visible: true,
-                    text: "Failed Automation Over Date"
-                }
-            });
-            ovizErrorCode.setVizProperties({
-                title: {
-                    visible: false,
-                }
-            });
+            // oVizAutomation.setVizProperties({
+            //     title: {
+            //         visible: true,
+            //         text: "Execution Time Over Date"
+            //     }
+            // });
+            // ovizErrorLine.setVizProperties({
+            //     title: {
+            //         visible: true,
+            //         text: "Failed Automation Over Date"
+            //     }
+            // });
+            // ovizErrorCode.setVizProperties({
+            //     title: {
+            //         visible: false,
+            //     }
+            // });
             
 
 
@@ -137,6 +138,101 @@ sap.ui.define([
             this._preSelectTokens();
             // this._loadDestination();
             // this.loadData();
+
+
+
+
+
+
+
+
+
+            var automationDetailsModel = new sap.ui.model.json.JSONModel({
+                instances: [],
+                failedCounts: [],
+                completedStatusData:[],
+                totalFailedCount: 0, 
+                totalExecutionTime: 0,
+                completedCount: 0,
+                runningCount:0
+            });
+        
+        this.getView().setModel(automationDetailsModel, "automationDetailsModel");
+
+
+var oVizFrame = this.getView().byId("maxResponseTimeChart");
+this.updateYAxisRangess(oVizFrame, 0, 15);
+        oVizFrame.setVizProperties({
+            title:{
+                visible: true,
+                text: "Executed Automations"
+            },
+            legend: {
+                visible: false 
+            }
+        });
+        oVizFrame.attachSelectData(function (oEvent) {
+            var startDate = this.getView().byId("dateTimePicker").getDateValue();
+            var endDate = this.getView().byId("dateTimePicker").getSecondDateValue();
+            var selectedData = oEvent.getParameter("data");
+            var selectedStatus= "Completed";
+        
+            if (selectedData && selectedData.length > 0) {
+                var selectedExecutionDate = selectedData[0].data["Execution Date"]; // X-axis dimension
+                var selectedTenant = selectedData[0].data["Tenant"]; // Color dimension
+                this.detailsAutomation(selectedExecutionDate,selectedTenant,selectedStatus,startDate,endDate);
+            }
+        }.bind(this));   
+        
+        var oVizFrameError = this.getView().byId("lineChart");
+        this.updateYAxis1Range(oVizFrameError, 0, 15);
+        oVizFrameError.setVizProperties({
+            title:{
+                visible: true,
+                text: "Failed Automations"
+            },
+            legend: {
+                visible: false 
+            }
+        });
+        oVizFrameError.attachSelectData(function (oEvent) {
+            var startDate = this.getView().byId("dateTimePicker").getDateValue();
+            var endDate = this.getView().byId("dateTimePicker").getSecondDateValue();
+            var selectedData = oEvent.getParameter("data");
+            var selectedStatus= "Failed";
+        
+            if (selectedData && selectedData.length > 0) {
+                var selectedExecutionDate = selectedData[0].data["Execution Date"]; 
+                var selectedTenant = selectedData[0].data["Tenant"]; 
+                this.detailsAutomation(selectedExecutionDate,selectedTenant,selectedStatus,startDate,endDate);
+          
+            }
+        }.bind(this)); 
+
+        var oVizFrameOnGoing = this.getView().byId("RunningChart");
+        this.updateYAxis1Ranges(oVizFrameOnGoing, 0, 15);
+        oVizFrameOnGoing.setVizProperties({
+            title:{
+                visible: true,
+                text: "OnGoing Automations"
+            },
+            legend: {
+                visible: false 
+            }
+        });
+        oVizFrameOnGoing.attachSelectData(function (oEvent) {
+            var startDate = this.getView().byId("dateTimePicker").getDateValue();
+            var endDate = this.getView().byId("dateTimePicker").getSecondDateValue();
+            var selectedData = oEvent.getParameter("data");
+            var selectedStatus= "In Progress";
+        
+            if (selectedData && selectedData.length > 0) {
+                var selectedExecutionDate = selectedData[0].data["Execution Date"]; 
+                var selectedTenant = selectedData[0].data["Tenant"]; 
+                this.detailsAutomation(selectedExecutionDate,selectedTenant,selectedStatus,startDate,endDate);
+          
+            }
+        }.bind(this));
 
         },
 
@@ -293,6 +389,53 @@ sap.ui.define([
                 that.getOwnerComponent().closeBusyDialog();
             });
         },
+        
+
+
+        // loadData: function (tenants) {
+        //     let that = this;
+        //     // this.getOwnerComponent().openBusyDialog();
+        //     let oModel = this.getOwnerComponent().getModel("wfModel");
+        
+        //     let oListBinding = oModel.bindList(`/getfilteration(tenants='${tenants}',status='')`);
+        //     oListBinding.requestContexts(0, 99999).then((aContexts) => {
+        //         // Flatten the data across all tenants into a single array
+        //         this.fetchedData = aContexts.flatMap(ctx => {
+        //             let instance = ctx.getObject();
+        //             // Each instance contains a 'tenant' and 'data' property
+        //             return instance.data.map(dataItem => ({
+        //                 ...dataItem,
+        //                 tenant: instance.tenant  // Add tenant property to each data item
+        //             }));
+        //         });
+        
+        //         console.log("Fetched Data as Array:", this.fetchedData);
+        
+        //         // Generate fetchedIdsString from the array format of fetchedData
+        //         this.fetchedIdsString = this.fetchedData.map(instance => instance.id).join('%2C');
+        
+        //         // Execute analyzeAutomation first, then fetchAutomationDetails
+        //         this.analyzeAutomation(that, tenants, this.fetchedIdsString)
+        //             .then(() => {
+        //                 // Once analyzeAutomation completes, call fetchAutomationDetails
+        //                 return this.fetchAutomationDetails(this.fetchedIdsString, tenants);
+        //             })
+        //             .then(() => {
+        //                 // Call onDateChange after both analyzeAutomation and fetchAutomationDetails are completed
+        //                 this.onDateChange();
+        //             })
+        //             .catch((error) => {
+        //                 console.error("Error in analyzeAutomation or fetchAutomationDetails:", error);
+        //             })
+        //             .finally(() => {
+        //                 // this.getOwnerComponent().closeBusyDialog();
+        //             });
+        
+        //     }).catch((error) => {
+        //         console.error("Error retrieving workflow instances:", error);
+        //         that.getOwnerComponent().closeBusyDialog();
+        //     });
+        // },
         
         
 
@@ -1340,257 +1483,469 @@ sap.ui.define([
 
 
 
-        fetchAutomationDetails: async function(instancsIds, tenants) {
-            // this.getOwnerComponent().openBusyDialog();
-            var that = this,
-                oModel = this.getOwnerComponent().getModel("wfModel"),
-                totalExecutionTimeInSeconds = 0,
-                allTenantData = {};
+        // fetchAutomationDetails: async function(instancsIds, tenants) {
+        //     // this.getOwnerComponent().openBusyDialog();
+        //     var that = this,
+        //         oModel = this.getOwnerComponent().getModel("wfModel"),
+        //         totalExecutionTimeInSeconds = 0,
+        //         allTenantData = {};
         
+        //     const dateFormat = sap.ui.core.format.DateFormat.getInstance({
+        //         pattern: "MMM dd hh:mm a",
+        //         calendarType: sap.ui.core.CalendarType.Gregorian
+        //     });
+        
+        //     try {
+        //         // Await the result of the requestContexts call to ensure it's completed before moving forward
+        //         const aContexts = await oModel.bindList(`/automationDetails(tenants='${tenants}',instanceId='${instancsIds}')`)
+        //             .requestContexts();
+        
+        //         aContexts.forEach(oContext => {
+        //             let oData = oContext.getObject(),
+        //                 tenant = oData.tenant,
+        //                 instanceId = oData.instanceId;
+        
+        //                 if (Array.isArray(oData.automationDetails)) {
+        //                     oData.automationDetails.forEach(automationDetail => {
+        //                         // Add to totalExecutionTimeInSeconds only for completed status
+        //                         if (automationDetail.status === "Completed") {
+        //                             totalExecutionTimeInSeconds += automationDetail.duration || 0;
+        //                         }
+        
+        //                         if (automationDetail.startTime) {
+        //                             const startDate = new Date(automationDetail.startTime);
+        //                             automationDetail.executionDate = dateFormat.format(startDate);
+        //                         }
+        
+        //                         automationDetail.tenant = tenant;
+        //                         automationDetail.instanceId = instanceId;
+        
+        //                         allTenantData[tenant] = allTenantData[tenant] || [];
+        //                         allTenantData[tenant].push(automationDetail);
+        //                     });
+        //                 }
+        //             });
+        
+        //             var allFlattenedData = Object.values(allTenantData).flat();
+        //             that.originalData = allFlattenedData;
+        
+        //             // Filter data for completed automation status
+        //             var completedStatusData = allFlattenedData.filter(function(automationDetail) {
+        //                 return automationDetail.status === "Completed";
+        //             });
+        
+        //             // Process failed data counts
+        //             let { failedCounts, totalFailedCount } = that.processFailedData(allFlattenedData);
+        
+        //             // Get the existing model
+        //             var automationDetailsModel = that.getView().getModel("automationDetailsModel");
+        
+        //             // Format the final total execution time to three decimal places
+        //             totalExecutionTimeInSeconds = parseFloat(totalExecutionTimeInSeconds.toFixed(3));
+        
+        //         // Update model properties
+        //         automationDetailsModel.setProperty("/instances", allFlattenedData);
+        //         automationDetailsModel.setProperty("/failedCounts", failedCounts);
+        //         automationDetailsModel.setProperty("/totalFailedCount", totalFailedCount); 
+        //         automationDetailsModel.setProperty("/totalExecutionTime", totalExecutionTimeInSeconds);
+        //         automationDetailsModel.setProperty("/completedStatusData", completedStatusData); // Store completed data
+        
+        //         // Bind the updated model to VizFrame
+        //         var oVizFrame = that.getView().byId("maxResponseTimeChart");
+        //         oVizFrame.setModel(automationDetailsModel);
+        
+        //         // Call onDateChange after the data loading is fully completed
+        //         this.onDateChange();
+        //         that.getOwnerComponent().closeBusyDialog();
+        //         // sap.m.MessageToast.show("Automation Details Loaded Successfully");
+        //     } catch (error) {
+        //         console.error("Error fetching automation details: ", error);
+        //         // sap.m.MessageToast.show("Error Loading Automation Details");
+        //     }
+        // },
+
+
+
+        fetchAutomationDetails: function(instanceIds, tenants) {
+            const that = this,
+                oModel = this.getOwnerComponent().getModel("wfModel"),
+                allTenantData = {};
+            oModel.bindList(`/automationDetails(tenants='${tenants}',instanceId='${instanceIds}')`)
+                .requestContexts()
+                .then(aContexts => {
+                    aContexts.forEach(oContext => {
+                        const oData = oContext.getObject(),
+                            tenant = oData.tenant,
+                            instanceId = oData.instanceId;
+
+                        (oData.automationDetails || []).forEach(automationDetail => {
+                            Object.assign(automationDetail, { tenant, instanceId });
+                            if (!allTenantData[tenant]) {
+                                allTenantData[tenant] = [];
+                            }
+                            allTenantData[tenant].push(automationDetail);
+                        });
+                    });
+                    that.originalData = Object.values(allTenantData).flat();
+                    this.onDateChange();
+                    that.getOwnerComponent().closeBusyDialog();
+                    // sap.m.MessageToast.show("Automation Details Loaded Successfully");
+                })
+                .catch(error => {
+                    console.error("Error fetching automation details: ", error);
+                    setTimeout(() => that.closeBusyDialog(), 1000);
+                    // sap.m.MessageToast.show("Error Loading Automation Details");
+                });
+        },
+                                     
+        // processFailedData: function (filteredData, sameDay, withinMonth) {
+        //     const tenantWiseFailedCounts = {}; 
+        //     let dateFormat;
+        //     let totalFailedCount = 0; 
+
+        //     if (sameDay) {
+        //         dateFormat = sap.ui.core.format.DateFormat.getInstance({
+        //             pattern: "MMM dd hh:mm a",
+        //             calendarType: sap.ui.core.CalendarType.Gregorian
+        //         });
+        //     } else if (withinMonth) {
+        //         dateFormat = sap.ui.core.format.DateFormat.getInstance({
+        //             pattern: "MMM dd",
+        //             calendarType: sap.ui.core.CalendarType.Gregorian
+        //         });
+        //     } else {
+        //         dateFormat = sap.ui.core.format.DateFormat.getInstance({
+        //             pattern: "MMM yyyy",
+        //             calendarType: sap.ui.core.CalendarType.Gregorian
+        //         });
+        //     }
+
+        //     filteredData.forEach((automationDetail) => {
+        //         if (automationDetail.status === "Failed") {
+        //             const executionDate = dateFormat.format(new Date(automationDetail.startTime));
+        //             const tenant = automationDetail.tenant;
+        
+        //             // Initialize if not already present
+        //             if (!tenantWiseFailedCounts[executionDate]) {
+        //                 tenantWiseFailedCounts[executionDate] = {};
+        //             }
+        //             if (!tenantWiseFailedCounts[executionDate][tenant]) {
+        //                 tenantWiseFailedCounts[executionDate][tenant] = 0;
+        //             }
+
+        //             tenantWiseFailedCounts[executionDate][tenant]++;
+        //             totalFailedCount++;
+        //         }
+        //     });
+        
+        //     const flattenedFailedData = [];
+        //     for (const executionDate in tenantWiseFailedCounts) {
+        //         for (const tenant in tenantWiseFailedCounts[executionDate]) {
+        //             flattenedFailedData.push({
+        //                 executionDate: executionDate,
+        //                 tenant: tenant,
+        //                 failedCount: tenantWiseFailedCounts[executionDate][tenant]
+        //             });
+        //         }
+        //     }
+
+        //     return {
+        //         flattenedFailedData: flattenedFailedData,
+        //         totalFailedCount: totalFailedCount
+        //     };
+        // }, 
+
+
+
+        processFailedData: function (filteredData, sameDay, withinMonth) {
+            const tenantWiseFailedCounts = {};
             const dateFormat = sap.ui.core.format.DateFormat.getInstance({
-                pattern: "MMM dd hh:mm a",
+                pattern: sameDay ? "MMM dd hh:mm a" : withinMonth ? "MMM dd" : "MMM yyyy",
                 calendarType: sap.ui.core.CalendarType.Gregorian
             });
         
-            try {
-                // Await the result of the requestContexts call to ensure it's completed before moving forward
-                const aContexts = await oModel.bindList(`/automationDetails(tenants='${tenants}',instanceId='${instancsIds}')`)
-                    .requestContexts();
-        
-                aContexts.forEach(oContext => {
-                    let oData = oContext.getObject(),
-                        tenant = oData.tenant,
-                        instanceId = oData.instanceId;
-        
-                        if (Array.isArray(oData.automationDetails)) {
-                            oData.automationDetails.forEach(automationDetail => {
-                                // Add to totalExecutionTimeInSeconds only for completed status
-                                if (automationDetail.status === "Completed") {
-                                    totalExecutionTimeInSeconds += automationDetail.duration || 0;
-                                }
-        
-                                if (automationDetail.startTime) {
-                                    const startDate = new Date(automationDetail.startTime);
-                                    automationDetail.executionDate = dateFormat.format(startDate);
-                                }
-        
-                                automationDetail.tenant = tenant;
-                                automationDetail.instanceId = instanceId;
-        
-                                allTenantData[tenant] = allTenantData[tenant] || [];
-                                allTenantData[tenant].push(automationDetail);
-                            });
-                        }
-                    });
-        
-                    var allFlattenedData = Object.values(allTenantData).flat();
-                    that.originalData = allFlattenedData;
-        
-                    // Filter data for completed automation status
-                    var completedStatusData = allFlattenedData.filter(function(automationDetail) {
-                        return automationDetail.status === "Completed";
-                    });
-        
-                    // Process failed data counts
-                    let { failedCounts, totalFailedCount } = that.processFailedData(allFlattenedData);
-        
-                    // Get the existing model
-                    var automationDetailsModel = that.getView().getModel("automationDetailsModel");
-        
-                    // Format the final total execution time to three decimal places
-                    totalExecutionTimeInSeconds = parseFloat(totalExecutionTimeInSeconds.toFixed(3));
-        
-                // Update model properties
-                automationDetailsModel.setProperty("/instances", allFlattenedData);
-                automationDetailsModel.setProperty("/failedCounts", failedCounts);
-                automationDetailsModel.setProperty("/totalFailedCount", totalFailedCount); 
-                automationDetailsModel.setProperty("/totalExecutionTime", totalExecutionTimeInSeconds);
-                automationDetailsModel.setProperty("/completedStatusData", completedStatusData); // Store completed data
-        
-                // Bind the updated model to VizFrame
-                var oVizFrame = that.getView().byId("maxResponseTimeChart");
-                oVizFrame.setModel(automationDetailsModel);
-        
-                // Call onDateChange after the data loading is fully completed
-                this.onDateChange();
-                that.getOwnerComponent().closeBusyDialog();
-                // sap.m.MessageToast.show("Automation Details Loaded Successfully");
-            } catch (error) {
-                console.error("Error fetching automation details: ", error);
-                // sap.m.MessageToast.show("Error Loading Automation Details");
-            }
-        },
-                                     
-        processFailedData: function(automationDetails, sameDay, withinMonth) {
-            let failedCountByStartTime = {};
             let totalFailedCount = 0;
-            let dateFormat;
+
+            filteredData.forEach(({ status, startTime, tenant }) => {
+                if (status === "Failed") {
+                    const executionDate = dateFormat.format(new Date(startTime));
+
+                    tenantWiseFailedCounts[executionDate] = tenantWiseFailedCounts[executionDate] || {};
+                    tenantWiseFailedCounts[executionDate][tenant] = (tenantWiseFailedCounts[executionDate][tenant] || 0) + 1;
         
-            if (sameDay) {
-                // Format by hour for same-day range
-                dateFormat = sap.ui.core.format.DateFormat.getInstance({
-                    pattern: "MMM dd hh:mm a", 
-                    calendarType: sap.ui.core.CalendarType.Gregorian
-                });
-            } else if (withinMonth) {
-                // Format by day for ranges within a month
-                dateFormat = sap.ui.core.format.DateFormat.getInstance({
-                    pattern: "MMM dd", 
-                    calendarType: sap.ui.core.CalendarType.Gregorian
-                });
-            } else {
-                // Format by month for ranges longer than a month
-                dateFormat = sap.ui.core.format.DateFormat.getInstance({
-                    pattern: "MMM yyyy", 
-                    calendarType: sap.ui.core.CalendarType.Gregorian
-                });
-            }
-        
-            automationDetails.forEach(detail => {
-                if (detail.status === 'Failed' && detail.startTime) {
-                    const startTime = new Date(detail.startTime); 
-                    const formattedStartTime = dateFormat.format(startTime);
-        
-                    if (!failedCountByStartTime[formattedStartTime]) {
-                        failedCountByStartTime[formattedStartTime] = 0;
-                    }
-                    failedCountByStartTime[formattedStartTime]++;
                     totalFailedCount++;
                 }
             });
+
+            const flattenedFailedData = Object.entries(tenantWiseFailedCounts).flatMap(([executionDate, tenants]) =>
+                Object.entries(tenants).map(([tenant, failedCount]) => ({
+                    executionDate,
+                    tenant,
+                    failedCount
+                }))
+            );
         
-            return { 
-                failedCounts: Object.entries(failedCountByStartTime).map(([formattedStartTime, count]) => ({
-                    startTime: formattedStartTime, 
-                    count: count
-                })), 
+            return {
+                flattenedFailedData,
                 totalFailedCount
             };
-        },  
+        },
 
             
-        _filterDataByDateRange: function(startDate, endDate) {
-                        var that = this;
-                        let allData = this.originalData;
-                        let tenantWiseData = {};
+        // _filterDataByDateRange: function(startDate, endDate) {
+        //                 var that = this;
+        //                 let allData = this.originalData;
+        //                 let tenantWiseData = {};
                     
-                        // Group data by tenant
-                        allData.forEach(automationDetail => {
-                            if (!tenantWiseData[automationDetail.tenant]) {
-                                tenantWiseData[automationDetail.tenant] = [];
-                            }
-                            tenantWiseData[automationDetail.tenant].push(automationDetail);
-                        });
+        //                 // Group data by tenant
+        //                 allData.forEach(automationDetail => {
+        //                     if (!tenantWiseData[automationDetail.tenant]) {
+        //                         tenantWiseData[automationDetail.tenant] = [];
+        //                     }
+        //                     tenantWiseData[automationDetail.tenant].push(automationDetail);
+        //                 });
                     
-                        let filteredData = [];
-                        for (const tenant in tenantWiseData) {
-                            const tenantData = tenantWiseData[tenant].filter(function(automationDetail) {
-                                const automationDate = new Date(automationDetail.startTime);
-                                // Filter by date range and error condition
-                                return automationDate >= startDate &&
-                                    automationDate <= endDate &&
-                                    !automationDetail.error; // Assuming error indicates failure
-                            });
-                            filteredData.push(...tenantData);
-                        }
+        //                 let filteredData = [];
+        //                 for (const tenant in tenantWiseData) {
+        //                     const tenantData = tenantWiseData[tenant].filter(function(automationDetail) {
+        //                         const automationDate = new Date(automationDetail.startTime);
+        //                         // Filter by date range and error condition
+        //                         return automationDate >= startDate &&
+        //                             automationDate <= endDate &&
+        //                             !automationDetail.error; // Assuming error indicates failure
+        //                     });
+        //                     filteredData.push(...tenantData);
+        //                 }
                     
-                        // Determine date format based on date range
-                        const sameDay = startDate.toDateString() === endDate.toDateString();
-                        const withinMonth = (endDate - startDate) / (1000 * 60 * 60 * 24) <= 31;
-                        let dateFormat;
+        //                 // Determine date format based on date range
+        //                 const sameDay = startDate.toDateString() === endDate.toDateString();
+        //                 const withinMonth = (endDate - startDate) / (1000 * 60 * 60 * 24) <= 31;
+        //                 let dateFormat;
                     
-                        if (sameDay) {
-                            // Format by hour for same-day range
-                            dateFormat = sap.ui.core.format.DateFormat.getInstance({
-                                pattern: "MMM dd hh:mm a", 
-                                calendarType: sap.ui.core.CalendarType.Gregorian
-                            });
-                        } else if (withinMonth) {
-                            // Format by day for ranges within a month
-                            dateFormat = sap.ui.core.format.DateFormat.getInstance({
-                                pattern: "MMM dd", 
-                                calendarType: sap.ui.core.CalendarType.Gregorian
-                            });
-                        } else {
-                            // Format by month for ranges longer than a month
-                            dateFormat = sap.ui.core.format.DateFormat.getInstance({
-                                pattern: "MMM yyyy", 
-                                calendarType: sap.ui.core.CalendarType.Gregorian
-                            });
-                        }
+        //                 if (sameDay) {
+        //                     // Format by hour for same-day range
+        //                     dateFormat = sap.ui.core.format.DateFormat.getInstance({
+        //                         pattern: "MMM dd hh:mm a", 
+        //                         calendarType: sap.ui.core.CalendarType.Gregorian
+        //                     });
+        //                 } else if (withinMonth) {
+        //                     // Format by day for ranges within a month
+        //                     dateFormat = sap.ui.core.format.DateFormat.getInstance({
+        //                         pattern: "MMM dd", 
+        //                         calendarType: sap.ui.core.CalendarType.Gregorian
+        //                     });
+        //                 } else {
+        //                     // Format by month for ranges longer than a month
+        //                     dateFormat = sap.ui.core.format.DateFormat.getInstance({
+        //                         pattern: "MMM yyyy", 
+        //                         calendarType: sap.ui.core.CalendarType.Gregorian
+        //                     });
+        //                 }
                     
-                        // Apply formatted date to each instance based on date range
-                        filteredData.forEach(instance => {
-                            const date = new Date(instance.startTime);
-                            instance.executionDate = dateFormat.format(date); // Add executionDate property with formatted date
-                        });
+        //                 // Apply formatted date to each instance based on date range
+        //                 filteredData.forEach(instance => {
+        //                     const date = new Date(instance.startTime);
+        //                     instance.executionDate = dateFormat.format(date); // Add executionDate property with formatted date
+        //                 });
                     
-                        // Filter completed data within the date range
-                        let completedStatusData = filteredData.filter(function(automationDetail) {
-                            return automationDetail.status === "Completed";
-                        });
+        //                 // Filter completed data within the date range
+        //                 let completedStatusData = filteredData.filter(function(automationDetail) {
+        //                     return automationDetail.status === "Completed";
+        //                 });
                     
-                        let totalExecutionTimeInSeconds = completedStatusData.reduce((total, automationDetail) => {
-                            return total + Math.round((automationDetail.duration || 0) * 1000) / 1000;
-                        }, 0);
-                        totalExecutionTimeInSeconds = parseFloat(totalExecutionTimeInSeconds.toFixed(3));
+        //                 let totalExecutionTimeInSeconds = completedStatusData.reduce((total, automationDetail) => {
+        //                     return total + Math.round((automationDetail.duration || 0) * 1000) / 1000;
+        //                 }, 0);
+        //                 totalExecutionTimeInSeconds = parseFloat(totalExecutionTimeInSeconds.toFixed(3));
                     
-                        // Process failed counts based on the date range
-                        let { failedCounts, totalFailedCount } = that.processFailedData(filteredData, sameDay, withinMonth);
+        //                 // Process failed counts based on the date range
+        //                 let { failedCounts, totalFailedCount } = that.processFailedData(filteredData, sameDay, withinMonth);
                     
-                        var automationDetailsModel = that.getView().getModel("automationDetailsModel");
+        //                 var automationDetailsModel = that.getView().getModel("automationDetailsModel");
                     
-                        if (filteredData.length > 0) {
-                            automationDetailsModel.setProperty("/instances", filteredData);
-                            automationDetailsModel.setProperty("/totalExecutionTime", totalExecutionTimeInSeconds);
-                            automationDetailsModel.setProperty("/completedStatusData", completedStatusData);
-                            automationDetailsModel.setProperty("/failedCounts", failedCounts);
-                            automationDetailsModel.setProperty("/totalFailedCount", totalFailedCount);
+        //                 if (filteredData.length > 0) {
+        //                     automationDetailsModel.setProperty("/instances", filteredData);
+        //                     automationDetailsModel.setProperty("/totalExecutionTime", totalExecutionTimeInSeconds);
+        //                     automationDetailsModel.setProperty("/completedStatusData", completedStatusData);
+        //                     automationDetailsModel.setProperty("/failedCounts", failedCounts);
+        //                     automationDetailsModel.setProperty("/totalFailedCount", totalFailedCount);
                     
-                            // sap.m.MessageToast.show("Filtered Completed Automation Details Loaded Successfully");
-                        } else {
-                            automationDetailsModel.setProperty("/instances", []);
-                            automationDetailsModel.setProperty("/totalExecutionTime", 0);
-                            automationDetailsModel.setProperty("/failedCounts", []);
-                            automationDetailsModel.setProperty("/totalFailedCount", 0);
-                            automationDetailsModel.setProperty("/completedStatusData", []);
+        //                     // sap.m.MessageToast.show("Filtered Completed Automation Details Loaded Successfully");
+        //                 } else {
+        //                     automationDetailsModel.setProperty("/instances", []);
+        //                     automationDetailsModel.setProperty("/totalExecutionTime", 0);
+        //                     automationDetailsModel.setProperty("/failedCounts", []);
+        //                     automationDetailsModel.setProperty("/totalFailedCount", 0);
+        //                     automationDetailsModel.setProperty("/completedStatusData", []);
                     
-                            // sap.m.MessageToast.show("No completed automation details found for the selected date range.");
-                            // that.getOwnerComponent().closeBusyDialog();
-                        }
-                    },
-                    onAfterRendering: function() {
-                        var oTable = this.byId("statusTable");
-                        if (!this._bEventAttached) {
-                            oTable.attachEventOnce("updateFinished", function() {
-                                oTable.getItems().forEach(function(oItem) {
-                                    oItem.$().on("mouseenter", this.onCellHover.bind(this, oItem));
-                                    oItem.$().on("mouseleave", this.onCellLeave.bind(this));
-                                }.bind(this));
-                                this._bEventAttached = true;
-                            }.bind(this));
-                        }   
+        //                     // sap.m.MessageToast.show("No completed automation details found for the selected date range.");
+        //                     // that.getOwnerComponent().closeBusyDialog();
+        //                 }
+        //             },
+
+
+        _filterDataByDateRange: function (startDate, endDate) {
+            const allData = this.originalData;
+            const tenantWiseData = {};
+            const uniqueDates = new Set();
+            const filteredData = [];
+            const runningCounts = {};
+            const completedCounts = {};
+            const tenantWiseCompletedCounts = {};
+            const tenantWiseRunningCounts = {};
+            let runningCountTotal = 0;
+            let completedCount = 0;
+        
+            // Organize data tenant-wise
+            allData.forEach(automationDetail => {
+                if (!tenantWiseData[automationDetail.tenant]) {
+                    tenantWiseData[automationDetail.tenant] = [];
+                }
+                tenantWiseData[automationDetail.tenant].push(automationDetail);
+            });
+        
+            // Filter and process data within the date range
+            for (const tenant in tenantWiseData) {
+                const tenantData = tenantWiseData[tenant].filter(detail => {
+                    const automationDate = new Date(detail.startTime);
+                    return automationDate >= startDate && automationDate <= endDate && !detail.error;
+                });
+                filteredData.push(...tenantData);
+            }
+        
+            // Determine the date format based on the range
+            const sameDay = startDate.toDateString() === endDate.toDateString();
+            const withinMonth = (endDate - startDate) / (1000 * 60 * 60 * 24) <= 31;
+            const dateFormat = sap.ui.core.format.DateFormat.getInstance({
+                pattern: sameDay ? "MMM dd hh:mm a" : withinMonth ? "MMM dd" : "MMM yyyy",
+                calendarType: sap.ui.core.CalendarType.Gregorian
+            });
+        
+            // Process filtered data and calculate counts
+            filteredData.forEach((detail, index) => {
+                const executionDate = dateFormat.format(new Date(detail.startTime));
+                uniqueDates.add(executionDate);
+        
+                detail.executionDate = executionDate;
+                detail.uniqueKey = executionDate + "_" + index;
+        
+                if (detail.status === "In Progress") {
+                    runningCounts[executionDate] = (runningCounts[executionDate] || 0) + 1;
+                    runningCountTotal++;
+        
+                    if (!tenantWiseRunningCounts[executionDate]) {
+                        tenantWiseRunningCounts[executionDate] = {};
+                    }
+                    tenantWiseRunningCounts[executionDate][detail.tenant] =
+                        (tenantWiseRunningCounts[executionDate][detail.tenant] || 0) + 1;
+                } else if (detail.status === "Completed") {
+                    completedCounts[executionDate] = (completedCounts[executionDate] || 0) + 1;
+                    completedCount++;
+        
+                    if (!tenantWiseCompletedCounts[executionDate]) {
+                        tenantWiseCompletedCounts[executionDate] = {};
+                    }
+                    tenantWiseCompletedCounts[executionDate][detail.tenant] =
+                        (tenantWiseCompletedCounts[executionDate][detail.tenant] || 0) + 1;
+                }
+            });
+        
+            // Flatten completed chart data
+            const flattenedChartData = [];
+            uniqueDates.forEach(date => {
+                const tenantCounts = tenantWiseCompletedCounts[date] || {};
+                for (const tenant in tenantCounts) {
+                    flattenedChartData.push({
+                        executionDate: date,
+                        tenant: tenant,
+                        completedCount: tenantCounts[tenant],
+                        status: "Completed"
+                    });
+                }
+            });
+        
+            // Flatten running chart data
+            const flattenedRunningData = [];
+            uniqueDates.forEach(date => {
+                const tenantCounts = tenantWiseRunningCounts[date] || {};
+                for (const tenant in tenantCounts) {
+                    flattenedRunningData.push({
+                        executionDate: date,
+                        tenant: tenant,
+                        runningCount: tenantCounts[tenant],
+                        status: "In Progress"
+                    });
+                }
+            });
+        
+            // Calculate total execution time for completed status
+            const completedStatusData = filteredData.filter(detail => detail.status === "Completed");
+            const totalExecutionTimeInSeconds = parseFloat(
+                completedStatusData.reduce((total, detail) => total + (detail.duration || 0), 0).toFixed(3)
+            );
+        
+            // Process failed data
+            const failedDataResult = this.processFailedData(filteredData, sameDay, withinMonth);
+        
+            // Update the model
+            const automationDetailsModel = this.getView().getModel("automationDetailsModel");
+            if (filteredData.length > 0) {
+                automationDetailsModel.setProperty("/instances", filteredData);
+                automationDetailsModel.setProperty("/totalExecutionTime", totalExecutionTimeInSeconds);
+                automationDetailsModel.setProperty("/completedCount", completedCount);
+                automationDetailsModel.setProperty("/runningCount", runningCountTotal);
+                automationDetailsModel.setProperty("/flattenedChartData", flattenedChartData);
+                automationDetailsModel.setProperty("/failedCountsByTenant", failedDataResult.flattenedFailedData);
+                automationDetailsModel.setProperty("/totalFailedCount", failedDataResult.totalFailedCount);
+                automationDetailsModel.setProperty("/flattenedRunningData", flattenedRunningData);
+
+                this.getColordedGraph();
+                // sap.m.MessageToast.show("Filtered Completed Automation Details Loaded Successfully");
+            } else {
+                automationDetailsModel.setProperty("/instances", []);
+                automationDetailsModel.setProperty("/totalExecutionTime", 0);
+                automationDetailsModel.setProperty("/completedCount", 0);
+                automationDetailsModel.setProperty("/runningCount", 0);
+                automationDetailsModel.setProperty("/flattenedChartData", []);
+                automationDetailsModel.setProperty("/failedCountsByTenant", []);
+                automationDetailsModel.setProperty("/totalFailedCount", 0);
+                automationDetailsModel.setProperty("/flattenedRunningData", []);
+        
+                // sap.m.MessageToast.show("No completed automation details found for the selected date range.");
+            }
+        },
+                    // onAfterRendering: function() {
+                    //     var oTable = this.byId("statusTable");
+                    //     if (!this._bEventAttached) {
+                    //         oTable.attachEventOnce("updateFinished", function() {
+                    //             oTable.getItems().forEach(function(oItem) {
+                    //                 oItem.$().on("mouseenter", this.onCellHover.bind(this, oItem));
+                    //                 oItem.$().on("mouseleave", this.onCellLeave.bind(this));
+                    //             }.bind(this));
+                    //             this._bEventAttached = true;
+                    //         }.bind(this));
+                    //     }   
                         
-                        // var oBackButton = this.byId("bck2line");  // Assuming you have the back button with this ID
-                        // if (oBackButton) {
-                        //     // Make sure the back button is visible and enabled
-                        //     oBackButton.setVisible(true);  // Ensure the button is visible
-                        //     oBackButton.setEnabled(true);  // Ensure the button is enabled
-                        // }
+                    //     // var oBackButton = this.byId("bck2line");  // Assuming you have the back button with this ID
+                    //     // if (oBackButton) {
+                    //     //     // Make sure the back button is visible and enabled
+                    //     //     oBackButton.setVisible(true);  // Ensure the button is visible
+                    //     //     oBackButton.setEnabled(true);  // Ensure the button is enabled
+                    //     // }
 
-                        // var oBackButton = this.byId("bck2line");
+                    //     // var oBackButton = this.byId("bck2line");
 
-                        // if (oBackButton) {
-                        //     oBackButton.setVisible(true);  // Force visibility
-                        //     oBackButton.setEnabled(true);  // Force enablement
-                        // }
+                    //     // if (oBackButton) {
+                    //     //     oBackButton.setVisible(true);  // Force visibility
+                    //     //     oBackButton.setEnabled(true);  // Force enablement
+                    //     // }
                     
-                        // // Check if flip container is causing issues
-                        // var oFlipContainer = this.byId("flipContainer");
-                        // if (oFlipContainer && oFlipContainer.hasStyleClass("flipped")) {
-                        //     oFlipContainer.removeStyleClass("flipped");  // Ensure it's in the correct state
-                        // }
-                    },
+                    //     // // Check if flip container is causing issues
+                    //     // var oFlipContainer = this.byId("flipContainer");
+                    //     // if (oFlipContainer && oFlipContainer.hasStyleClass("flipped")) {
+                    //     //     oFlipContainer.removeStyleClass("flipped");  // Ensure it's in the correct state
+                    //     // }
+                    // },
 
                     // onBeforeRendering: function () {
                     //     var oModel = this.getView().getModel();
@@ -1599,38 +1954,38 @@ sap.ui.define([
                     //     }
                     // },
                     
-                    onCellHover: function(oItem) {
-                        var oContext = oItem.getBindingContext("errorCountModel");
-                        if (oContext) {
-                            var oData = oContext.getObject();
-                            var errorMessage = oData.errorMessage || "No error message available";
+                    // onCellHover: function(oItem) {
+                    //     var oContext = oItem.getBindingContext("errorCountModel");
+                    //     if (oContext) {
+                    //         var oData = oContext.getObject();
+                    //         var errorMessage = oData.errorMessage || "No error message available";
         
-                            if (!this._pErrorPopover) {
-                                this._pErrorPopover = Fragment.load({
-                                    id: this.getView().getId(),
-                                    name: "automationhealthapp.Fragments.errorCodeMessage",
-                                    controller: this
-                                }).then(function(oPopover) {
-                                    this.getView().addDependent(oPopover);
-                                    return oPopover;
-                                }.bind(this));
-                            }
+                    //         if (!this._pErrorPopover) {
+                    //             this._pErrorPopover = Fragment.load({
+                    //                 id: this.getView().getId(),
+                    //                 name: "automationhealthapp.Fragments.errorCodeMessage",
+                    //                 controller: this
+                    //             }).then(function(oPopover) {
+                    //                 this.getView().addDependent(oPopover);
+                    //                 return oPopover;
+                    //             }.bind(this));
+                    //         }
                     
-                            this._pErrorPopover.then(function(oPopover) {
-                                this.byId("popoverErrorMessage").setText(errorMessage);
-                                oPopover.openBy(oItem);
-                            }.bind(this));
-                        } else {
-                            console.warn("No context found for the hovered row.");
-                        }
-                    },
-                    onCellLeave: function() {
-                        if (this._pErrorPopover) {
-                            this._pErrorPopover.then(function(oPopover) {
-                                oPopover.close();
-                            });
-                        }
-                    },
+                    //         this._pErrorPopover.then(function(oPopover) {
+                    //             this.byId("popoverErrorMessage").setText(errorMessage);
+                    //             oPopover.openBy(oItem);
+                    //         }.bind(this));
+                    //     } else {
+                    //         console.warn("No context found for the hovered row.");
+                    //     }
+                    // },
+                    // onCellLeave: function() {
+                    //     if (this._pErrorPopover) {
+                    //         this._pErrorPopover.then(function(oPopover) {
+                    //             oPopover.close();
+                    //         });
+                    //     }
+                    // },
 
 
 
@@ -1794,6 +2149,7 @@ sap.ui.define([
         var oFlipContainer = this.byId("flipContainer");
         // var oLineChartContainer = this.byId("lineChartContainer");
         var oBarChartContainer = this.byId("barChartContainer");
+        var oBackButton = this.byId("bck2line");
     
         // Add the 'flipped' class for animation
         oFlipContainer.addStyleClass("flipped");
@@ -1802,6 +2158,7 @@ sap.ui.define([
         setTimeout(function () {
             // oLineChartContainer.setVisible(false);
             oBarChartContainer.setVisible(true);
+            oBackButton.setVisible(true);
         }, 400); // Match the CSS transition duration
     },
     
@@ -1827,6 +2184,7 @@ sap.ui.define([
                         var oFlipContainer = this.byId("flipContainer");
                         var oLineChartContainer = this.byId("lineChartContainer");
                         var oBarChartContainer = this.byId("barChartContainer");
+                        var oBackButton = this.byId("bck2line");
                     
                         // Remove the 'flipped' class for animation
                         oFlipContainer.removeStyleClass("flipped");
@@ -1835,6 +2193,7 @@ sap.ui.define([
                         setTimeout(function () {
                             oBarChartContainer.setVisible(false);
                             oLineChartContainer.setVisible(true);
+                            oBackButton.setVisible(false);
                         }, 600); // Match the CSS transition duration
                     },
                     
@@ -2094,7 +2453,268 @@ sap.ui.define([
                         // } else {
                             console.warn("No data point selected in bar chart");
                         }
-                    },                  
+                    }, 
+
+
+                    // onAfterRendering: function () {
+                    //     var oBarChartContainer = this.byId("barChartContainer");
+                    //     var oBackButton = this.byId("bck2line");
+                    
+                    //     if (oBarChartContainer.getVisible()) {
+                    //         oBackButton.setVisible(true); // Reinforce the button visibility
+                    //     }
+                    // },
+
+                    _onRouteMatched: function () {
+                        // Ensure the bar chart and button are visible and enabled
+                        var oBarChartContainer = this.byId("barChartContainer");
+                        var oBackButton = this.byId("bck2line");
+                    
+                        // Make sure the bar chart and the back button are visible
+                        oBarChartContainer.setVisible(true); // Show the bar chart
+                        oBackButton.setVisible(true);        // Show the back button
+                    
+                        // Optional: Enable the button if it was disabled
+                        oBackButton.setEnabled(true);
+                    
+                        // Debugging logs to verify visibility and enablement
+                        console.log("Bar Chart Visible:", oBarChartContainer.getVisible());
+                        console.log("Back Button Visible:", oBackButton.getVisible());
+                        console.log("Back Button Enabled:", oBackButton.getEnabled());
+                    },
+                    
+
+                    _onBrowserBack: function () {
+                        // Ensure this logic is executed when navigating back
+                        if (this.getView().getId().includes("automationhealthview")) {
+                            this._adjustUI();
+                        }
+                    },
+                    
+                    _adjustUI: function () {
+                        // Example: Reset button visibility or perform any required updates
+                        var oBarChartContainer = this.byId("barChartContainer");
+                        var oBackButton = this.byId("bck2line");
+                        // const oButton = this.byId("bck2line");
+                        oBarChartContainer.setVisible(true);
+                        oBackButton.setVisible(true);
+                    },
+
+                    onExit: function () {
+                        // Remove the event listener when the view is destroyed
+                        window.removeEventListener("popstate", this._onBrowserBack.bind(this));
+                    },
+                    
+                    
+                    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    detailsAutomation: function(selectedExecutionDate,selectedTenant,selectedStatus,startDate,endDate){
+                        
+                        var automationDetailsModel = this.getView().getModel("automationDetailsModel");
+                        var allData = automationDetailsModel.getProperty("/instances"); 
+            
+                        var Data = allData.filter(function (item) {
+                            return (
+                                item.executionDate === selectedExecutionDate &&
+                                item.tenant === selectedTenant &&
+                                item.status === selectedStatus
+                            );
+                        });
+                
+                        // Create or update the related data model
+                        var relatedDataModel = new sap.ui.model.json.JSONModel();
+                        this.getOwnerComponent().setModel(relatedDataModel, "relatedDataModel");
+                        relatedDataModel.setData({
+                            relatedData: Data,
+                            startDate: startDate,
+                            endDate: endDate
+                        });
+                
+                        if (Data.length > 0) {
+                            console.log("Filtered Data: ", Data);
+                
+                            // Pass tenant as a parameter to the route
+                            var encodedTenant = window.encodeURIComponent(selectedTenant);
+                            var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+                            oRouter.navTo("Automationdetail", {
+                                automationPath: "relatedData",
+                                tenant: encodedTenant
+                            });
+                        } else {
+                            // sap.m.MessageToast.show(
+                            //     "No completed automation details found for the selected data point."
+                            // );
+                        }
+                    },   
+                    updateYAxis1Range: function (oVizFrame, min, max) {
+                        var oVizProperties = {
+                            "plotArea": {
+                                "dataLabel": {
+                                    "visible": false
+                                },
+                                "primaryScale": {
+                                    "fixedRange": true,
+                                    "minValue": min,
+                                    "maxValue": max
+                                }
+                            }
+                        };
+                    
+                        oVizFrame.setVizProperties(oVizProperties);
+                    },
+                    updateYAxis1Ranges: function (oVizFrameOnGoing, min, max) {
+                        var oVizProperties = {
+                            "plotArea": {
+                                "dataLabel": {
+                                    "visible": false
+                                },
+                                "primaryScale": {
+                                    "fixedRange": true,
+                                    "minValue": min,
+                                    "maxValue": max
+                                }
+                            }
+                        };
+                    
+                        oVizFrameOnGoing.setVizProperties(oVizProperties);
+                    },
+
+                    updateYAxisRangess: function (oVizFrame, min, max) {
+                        var oVizProperties = {
+                            "plotArea": {
+                                "dataLabel": {
+                                    "visible": false
+                                },
+                                "primaryScale": {
+                                    "fixedRange": true,
+                                    "minValue": min,
+                                    "maxValue": max
+                                }
+                            }
+                        };
+                
+                        oVizFrame.setVizProperties(oVizProperties);
+                },
+
+
+
+                    getColordedGraph: function(){
+                        var automationDetailsModel = this.getView().getModel("automationDetailsModel");
+                        var failedCountsByTenant = automationDetailsModel.getProperty("/failedCountsByTenant");
+                    
+                        // Extract unique tenants
+                        var uniqueTenants = [...new Set(failedCountsByTenant.map(data => data.tenant))];
+                    
+                        // Define a list of colors for tenants
+                        var colorPalette = [
+                            "#f58b00", "#b04238", "#e14b31", "#c23728","#df8879", "#c86558", "#b04238", "#991f17",  // Rust Orange
+                            "#e56b34",  // Copper
+                            "#f2a154",  // Soft Tangerine
+                            "#f3c057",  // Light Mustard Yellow
+                            "#d67f3f",  // Brownish Orange
+                            "#e7a039",  // Honey Gold
+                            "#cd6e3a"   // Warm Caramel
+                            ];
+        
+                        var rules = uniqueTenants.map((tenant, index) => {
+                            return {
+                                dataContext: { Tenant: tenant },
+                                properties: { color: colorPalette[index % colorPalette.length] }
+                            };
+                        });
+        
+                        var oVizFrame = this.byId("lineChart");
+                        oVizFrame.setVizProperties({
+                            plotArea: {
+                                dataPointStyle: {
+                                    rules: rules
+                                }
+                            }
+                        });
+                        var flattenedChartData = automationDetailsModel.getProperty("/flattenedChartData");
+                    
+                        // Extract unique tenants
+                        var uniqueTenants = [...new Set(flattenedChartData.map(data => data.tenant))];
+                    
+                        // Define a list of colors for tenants
+                        var colorPalette = [
+                           "#3D7317",  // Indigo
+                            "#63993D",  // Dark Red
+                            "#87BB62",  // Purple
+                            "#AFDC8F",  // Brown
+                            "#e377c2",  // Pink
+                            "#7f7f7f",  // Gray
+                            "#bcbd22",  // Olive Green
+                            "#17becf" ,
+                            "#D6C8E9",  // Lavender
+                            "#D3B7A3"
+                        ];
+        
+                        var rules = uniqueTenants.map((tenant, index) => {
+                            return {
+                                dataContext: { Tenant: tenant },
+                                properties: { color: colorPalette[index % colorPalette.length] }
+                            };
+                        });
+        
+                        var oVizFrameCom = this.byId("maxResponseTimeChart");
+                        oVizFrameCom.setVizProperties({
+                            plotArea: {
+                                dataPointStyle: {
+                                    rules: rules
+                                }
+                            }
+                        });
+                        var flattenedRunningData = automationDetailsModel.getProperty("/flattenedRunningData");
+                    
+                        // Extract unique tenants
+                        var uniqueTenants = [...new Set(flattenedRunningData.map(data => data.tenant))];
+                    
+                        // Define a list of colors for tenants
+                        var colorPalette = [
+                           "#115f9a", "#1984c5", "#22a7f0", "#48b5c4", "#76c68f"
+                        ];
+        
+                        var rules = uniqueTenants.map((tenant, index) => {
+                            return {
+                                dataContext: { Tenant: tenant },
+                                properties: { color: colorPalette[index % colorPalette.length] }
+                            };
+                        });
+        
+                        var oVizFrameCom = this.byId("RunningChart");
+                        oVizFrameCom.setVizProperties({
+                            plotArea: {
+                                dataPointStyle: {
+                                    rules: rules
+                                }
+                            }
+                        });
+                    },
 
 
                 });
